@@ -1,0 +1,3 @@
+[submodule "code/bashdl"]
+	path = code/bashdl
+	url = https://github.com/samiBendou/bashdl

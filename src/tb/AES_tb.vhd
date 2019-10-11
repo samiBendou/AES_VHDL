@@ -29,6 +29,9 @@ signal reset_is : std_logic;
 signal clock_is : std_logic;
 signal start_is : std_logic;
 begin
+	data_is <= X"3243f6a8885a308d313198a2e0370734";
+	key_is <= X"2b7e151628aed2a6abf7158809cf4f3c";
+
 	DUT : AES
 	port map(
 		clock_i => clock_is,
@@ -38,15 +41,6 @@ begin
 		data_i => data_is,
 		data_o => data_os,
 		aes_on_o => done_os);
-
-	P0 : process
-	begin
-		data_is <= X"004488cc115599dd2266aaee3377bbff";
-		key_is <= X"00";
-		wait for 2650 ns;
-		data_is <= X"3243f6a8885a308d313198a2e0370734";
-		wait;
-	end process P0;
 
 	P1 : process
 	begin

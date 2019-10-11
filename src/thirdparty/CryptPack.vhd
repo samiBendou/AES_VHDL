@@ -25,6 +25,7 @@ package crypt_pack is
 	type type_rcon is array(0 to 10) of bit8;
 	type type_word is array(0 to 3) of column_state;
 	type key_memory is array(0 to 10) of bit128;
+	type type_expanded_key is array(0 to 10) of bit128;
 
 -- Constant rcon
   constant Rcon : type_rcon := (

@@ -40,8 +40,7 @@ port (
 	count_i : in bit4;
 
 	end_o : out std_logic;
-	en_cpt_o : out std_logic;
-	init_cpt_o : out std_logic);
+	en_cpt_o : out std_logic);
 end component;
 
 component KeyExpansion
@@ -52,7 +51,6 @@ port (
 end component;
 
 signal en_s : std_logic;
-signal init_s : std_logic;
 
 signal count_s : bit4;
 signal rcon_s : bit8;
@@ -62,7 +60,7 @@ begin
 
 Count: Counter port map (
 	clock_i => clock_i,
-	resetb_i => init_s,
+	resetb_i => resetb_i,
 	en_i => en_s,
 	count_i => round_i,
 	count_o => count_s);
@@ -73,7 +71,6 @@ FSM: KeyExpansion_FSM port map (
 	start_i => start_i,
 	count_i => count_s,
 	end_o => end_o,
-	init_cpt_o => init_s,
 	en_cpt_o => en_s);
 
 Calculus: KeyExpansion port map (

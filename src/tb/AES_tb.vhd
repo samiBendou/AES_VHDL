@@ -41,9 +41,9 @@ begin
 
 	P0 : process
 	begin
-		data_is <= X"526573746f20656e2076696c6c65203f";
-		key_is <= X"2b7e151628aed2a6abf7158809cf4f3c";
-		wait for 2500 ns;
+		data_is <= X"004488cc115599dd2266aaee3377bbff";
+		key_is <= X"00";
+		wait for 2650 ns;
 		data_is <= X"3243f6a8885a308d313198a2e0370734";
 		wait;
 	end process P0;

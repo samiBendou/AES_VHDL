@@ -13,7 +13,6 @@ add wave -noupdate -radix hexadecimal /aes_tb/DUT/U0/Calculus/key_i
 add wave -noupdate -radix hexadecimal /aes_tb/DUT/U0/Calculus/key_o
 add wave -noupdate /aes_tb/DUT/U1/present_state
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {384 ns} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 238
 configure wave -valuecolwidth 100
@@ -30,3 +29,4 @@ configure wave -timeline 0
 configure wave -timelineunits ns
 update
 WaveRestoreZoom {0 ns} {854 ns}
+run 2650 ns

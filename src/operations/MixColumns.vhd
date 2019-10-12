@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 -- @author DAHOUX Sami
--- @date 29 Novembre 2018
--- @component InvMixColumns
+-- @date 27 Octobre 2017
+-- @component MixColumns
 --------------------------------------------------------------------------------
 
 library IEEE;
@@ -11,14 +11,16 @@ library lib_thirdparty;
 use lib_thirdparty.all;
 use lib_thirdparty.crypt_pack.all;
 
-entity InvMixColumns is
+entity MixColumns is
 port (
 	data_i : in type_state;
-	data_o : out type_state;
-	en_i : in std_logic);
-end entity InvMixColumns;
+	en_i : in std_logic;
+	inv_i : in std_logic;
+	data_o : out type_state
+	);
+end entity MixColumns;
 
-architecture InvMixColumns_arch of InvMixColumns is
+architecture MixColumns_arch of MixColumns is
 	signal data_s : type_state;
 
 	component MatrixMultiplier
@@ -28,6 +30,7 @@ architecture InvMixColumns_arch of InvMixColumns is
 		data_o : out column_state
 		);
 	end component;
+
 begin
 	data_o <= data_s when en_i = '1' else data_i;
 
@@ -38,11 +41,12 @@ begin
 			data_i(1) => data_i(1)(j),
 			data_i(2) => data_i(2)(j),
 			data_i(3) => data_i(3)(j),
-			inv_i => '1',
+			inv_i => inv_i,
 			data_o(0) => data_s(0)(j),
 			data_o(1) => data_s(1)(j),
 			data_o(2) => data_s(2)(j),
-			data_o(3) => data_s(3)(j));
+			data_o(3) => data_s(3)(j)
+		);
 	end generate ; -- col_prod
 
-end architecture InvMixColumns_arch;
+end architecture MixColumns_arch;

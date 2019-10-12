@@ -5,39 +5,44 @@
 --------------------------------------------------------------------------------
 
 library IEEE;
-library lib_rtl;
-library lib_thirdparty;
-
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+library lib_thirdparty;
 use lib_thirdparty.crypt_pack.all;
-use lib_rtl.all;
+
+library lib_operations;
+use lib_operations.all;
 
 entity MixColumns_tb is
 end entity;
 
 architecture MixColumns_tb_arch of MixColumns_tb is
 
-signal data_is : type_state;
-signal data_os : type_state;
-signal data_es : type_state;
-signal en_s : std_logic;
+    component MixColumns
+    port(
+        data_i : in type_state;
+        data_o : out type_state;
+        en_i : in std_logic;
+        inv_i : in std_logic
+        );
+    end component;
 
-component MixColumns
-port(
-    data_i : in type_state;
-    data_o : out type_state;
-    en_i : in std_logic);
-end component;
-
-signal cond_s : boolean;
+    signal data_is : type_state;
+    signal data_os : type_state;
+    signal data_es : type_state;
+    signal en_s : std_logic;
+    signal cond_s : boolean;
 
 begin
-    DUT : MixColumns port map(
+    DUT : MixColumns 
+    port map(
         data_i => data_is,
         data_o => data_os,
-        en_i => en_s);
+        en_i => en_s,
+        inv_i => '0'
+        );
 
     PUT : process
     begin
@@ -61,7 +66,7 @@ end architecture;
 configuration MixColumns_tb_conf of MixColumns_tb is
 for MixColumns_tb_arch
     for DUT : MixColumns
-        use entity lib_rtl.MixColumns(MixColumns_arch);
+        use entity lib_operations.MixColumns(MixColumns_arch);
     end for;
 end for;
 end configuration;

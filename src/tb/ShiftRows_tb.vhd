@@ -5,14 +5,14 @@
 --------------------------------------------------------------------------------
 
 library IEEE;
-library lib_rtl;
+library lib_operations;
 library lib_thirdparty;
 
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 use lib_thirdparty.crypt_pack.all;
-use lib_rtl.all;
+use lib_operations.all;
 
 entity ShiftRows_tb is
 end entity ShiftRows_tb;
@@ -21,33 +21,39 @@ architecture ShiftRows_tb_arch of ShiftRows_tb is
     signal data_is : type_state;
     signal data_os : type_state;
 
-    component ShiftRows port(
+    component ShiftRows 
+    port(
         data_i : in type_state;
-        data_o : out type_state);
+        en_i : in std_logic;
+        inv_i : in std_logic;
+        data_o : out type_state
+        );
     end component;
 
-    begin
+begin
     DUT: ShiftRows
     port map(
-    	data_i => data_is,
-    	data_o => data_os);
+        data_i => data_is,
+        en_i => '1',
+        inv_i => '0',
+        data_o => data_os
+        );
 
-    P0 : process
+    PUT : process
     begin
-
         data_is(0) <= (x"01", x"00", x"00", x"00");
         data_is(1) <= (x"00", x"01", x"00", x"00");
         data_is(2) <= (x"00", x"00", x"01", x"00");
         data_is(3) <= (x"00", x"00", x"00", x"01");
     wait;
-    end process P0;
+    end process PUT;
 
 end architecture ShiftRows_tb_arch;
 
 configuration ShiftRows_tb_conf of ShiftRows_tb is
 for ShiftRows_tb_arch
     for DUT : ShiftRows
-        use entity lib_rtl.ShiftRows(ShiftRows_arch);
+        use entity lib_operations.ShiftRows(ShiftRows_arch);
     end for;
 end for;
 end configuration;

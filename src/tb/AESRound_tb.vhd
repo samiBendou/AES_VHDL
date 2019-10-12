@@ -1,11 +1,12 @@
 library IEEE;
-library lib_rtl;
-library lib_thirdparty;
-
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+library lib_thirdparty;
 use lib_thirdparty.crypt_pack.all;
+
+library lib_rtl;
 use lib_rtl.all;
 
 
@@ -16,19 +17,19 @@ architecture AESRound_tb_arch of AESRound_tb is
 
     component AESRound
     port(
-	text_i : in bit128;
-	currentkey_i : in bit128;
-	data_o : out bit128;
-	clock_i : in std_logic;
-	resetb_i : in std_logic;
-	enableMixcolumns_i : in std_logic;
-	enableRoundcomputing_i : in std_logic
-    );
+        text_i : in bit128;
+        currentkey_i : in bit128;
+        data_o : out bit128;
+        clock_i : in std_logic;
+        resetb_i : in std_logic;
+        enableMixcolumns_i : in std_logic;
+        enableRoundcomputing_i : in std_logic
+        );
     end component;
 
     signal data_is, data_os, currentkey_s : bit128;
-    signal cond_s : boolean;
     signal en_s, en_mixcolumns_s, resetb_s : std_logic;
+    signal cond_s : boolean;
     signal clock_s : std_logic;
 
 begin

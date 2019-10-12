@@ -8,9 +8,9 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
+
 library lib_thirdparty;
 use lib_thirdparty.crypt_pack.all;
-
 
 entity KeyExpansion is
 port (
@@ -27,12 +27,6 @@ signal key_sub_s : type_word;
 signal key_xor_s : type_word;
 signal rcon_s : column_state;
 
-
-component SBOX
-    port(sbox_i : in bit8;
-         sbox_o : out bit8);
-end component;
-
 --Transformation de l'entrée en tableau state_t
 begin
 col_in : for j in 0 to 3 generate
@@ -41,7 +35,7 @@ col_in : for j in 0 to 3 generate
 	end generate raw_in;
 end generate col_in;
 
---Transformation de Rcon en column_state.
+--Transformation of Rcon to column_state.
 rcon_s(0) <= rcon_i;
 rcon_s(1) <= x"00";
 rcon_s(2) <= x"00";
@@ -53,15 +47,12 @@ key_rot_s(0)(0) <= key_i_s(3)(1);
 key_rot_s(0)(1) <= key_i_s(3)(2);
 key_rot_s(0)(2) <= key_i_s(3)(3);
 
---SubBytes sur 4 octets
-raw_sub : for i in 0 to 3 generate
-	inter_sbox: SBOX port map (
-		sbox_i => key_rot_s(0)(i),
-		sbox_o => key_sub_s(0)(i)
-	);
-end generate raw_sub;
+--SubBytes over 4 bytes
+key_sub_s(0)(0) <= sbox_c(to_integer(unsigned(key_rot_s(0)(0))));
+key_sub_s(0)(1) <= sbox_c(to_integer(unsigned(key_rot_s(0)(1))));
+key_sub_s(0)(2) <= sbox_c(to_integer(unsigned(key_rot_s(0)(2))));
+key_sub_s(0)(3) <= sbox_c(to_integer(unsigned(key_rot_s(0)(3))));
 
---XOR
 key_xor_s(0) <= rcon_s xor (key_sub_s(0) xor key_i_s(0));
 key_xor_s(1) <= key_i_s(1) xor key_xor_s(0);
 key_xor_s(2) <= key_i_s(2) xor key_xor_s(1);

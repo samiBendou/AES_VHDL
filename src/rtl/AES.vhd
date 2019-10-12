@@ -65,7 +65,7 @@ signal enableOutput_s : std_logic;
 begin
 	-- positive reset
 	resetb_s <= not reset_i;
-	data_o <= data_os when enableOutput_s = '1' else (others => '0');
+	data_o <= data_is when enableOutput_s = '1' else (others => '0');
 	currentkey_s <= outputKeyExpander_s(to_integer(unsigned(round_keyexpander_s)));
 	-- key expander component
 	U0 : KeyExpansion_I_O

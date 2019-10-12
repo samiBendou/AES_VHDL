@@ -47,10 +47,9 @@ signal outputShiftRows_s : type_state;
 signal outputMixColumns_s : type_state;
 signal vectorAddRoundkey_s : bit128;
 begin
-	inputSubBytes_s <= data_s;
 	U0 : SubBytes
 	port map(
-		data_i => inputSubBytes_s,
+		data_i => textState_s,
 		data_o => outputSubBytes_s);
 
 	U1 : ShiftRows
@@ -68,7 +67,7 @@ begin
 	port map(
 		data_i => inputAddRoundKey_s,
 		key_i => currentStateKey_s,
-		data_o => outputAddRoundkey_s);
+		data_o => data_s);
 
 	-- convert text on 128bits to type state
 	F0 : for i in 0 to 3 generate
@@ -94,19 +93,6 @@ begin
 	-- select AddRoundKey function input according to round computing (initial or next others)
 	inputAddRoundKey_s <= outputMixColumns_s when enableRoundcomputing_i = '1' else textState_s;
 
-	-- store AddRoundKey function output
-	P0 : process(outputAddRoundkey_s, clock_i, resetb_i)
-	begin
-		if resetb_i = '0' then
-			F6 : for i in 0 to 3 loop
-				F7 : for j in 0 to 3 loop
-					data_s(i)(j) <= (others => '0');
-				end loop;
-			end loop;
-		elsif (rising_edge(clock_i)) then
-			data_s <= outputAddRoundkey_s;
-		end if;
-	end process P0;
 end architecture AESRound_arch;
 
 configuration AESRound_configuration of AESRound is

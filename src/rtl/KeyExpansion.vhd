@@ -70,7 +70,7 @@ key_xor_s(3) <= key_i_s(3) xor key_xor_s(2);
 --Transformation de la sortie en vecteur de 128 bits
 col_out : for j in 0 to 3 generate
 	raw_out : for i in 0 to 3 generate
-		key_o(127-32*j-8*i downto 120-32*j-8*i) <= key_xor_s(i)(j);
+		key_o(127-32*i-8*j downto 120-32*i-8*j) <= key_xor_s(i)(j);
 	end generate raw_out;
 end generate col_out;
 

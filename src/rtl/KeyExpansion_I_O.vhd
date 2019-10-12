@@ -17,9 +17,8 @@ entity KeyExpansion_I_O is
 		start_i : in std_logic;
 		end_o : out std_logic;
 		round_i : in bit4;
-		round_o : out bit4;
 		key_i : in bit128;
-		key_o : out bit128);
+		key_o : out type_expanded_key);
 end entity KeyExpansion_I_O;
 
 architecture KeyExpansion_I_O_arch of KeyExpansion_I_O is
@@ -40,8 +39,7 @@ port (
 	count_i : in bit4;
 
 	end_o : out std_logic;
-	en_cpt_o : out std_logic;
-	init_cpt_o : out std_logic);
+	en_cpt_o : out std_logic);
 end component;
 
 component KeyExpansion
@@ -52,36 +50,36 @@ port (
 end component;
 
 signal en_s : std_logic;
-signal init_s : std_logic;
 
 signal count_s : bit4;
 signal rcon_s : bit8;
 
+signal key_s : type_expanded_key;
 
 begin
+	key_o <= key_s;
 
-Count: Counter port map (
-	clock_i => clock_i,
-	resetb_i => init_s,
-	en_i => en_s,
-	count_i => round_i,
-	count_o => count_s);
+	Count: Counter port map (
+		clock_i => clock_i,
+		resetb_i => resetb_i,
+		en_i => en_s,
+		count_i => round_i,
+		count_o => count_s);
 
-FSM: KeyExpansion_FSM port map (
-	clock_i => clock_i,
-	resetb_i => resetb_i,
-	start_i => start_i,
-	count_i => count_s,
-	end_o => end_o,
-	init_cpt_o => init_s,
-	en_cpt_o => en_s);
+	FSM: KeyExpansion_FSM port map (
+		clock_i => clock_i,
+		resetb_i => resetb_i,
+		start_i => start_i,
+		count_i => count_s,
+		end_o => end_o,
+		en_cpt_o => en_s);
 
-Calculus: KeyExpansion port map (
-	key_i => key_i,
-	key_o => key_o,
-	rcon_i => rcon_s);
-
-round_o <= count_s;
-rcon_s <= Rcon(to_integer(unsigned(count_s)));
+	key_s(0) <= key_i;
+	keyExpanders : for k in 1 to 10 generate
+		expandern: KeyExpansion port map (
+			key_i => key_s(k - 1),
+			rcon_i => Rcon(k - 1),
+			key_o => key_s(k));
+	end generate ; -- keyExpanders
 
 end architecture KeyExpansion_I_O_arch;

@@ -18,8 +18,10 @@ entity MixColumns_tb is
 end entity;
 
 architecture MixColumns_tb_arch of MixColumns_tb is
+
 signal data_is : type_state;
 signal data_os : type_state;
+signal data_es : type_state;
 signal en_s : std_logic;
 
 component MixColumns
@@ -29,21 +31,30 @@ port(
     en_i : in std_logic);
 end component;
 
-begin
-DUT : MixColumns port map(
-    data_i => data_is,
-    data_o => data_os,
-    en_i => en_s);
+signal cond_s : boolean;
 
-P0 : process
 begin
-data_is(0) <= (x"01", x"00", x"00", x"00");
-data_is(1) <= (x"00", x"01", x"00", x"00");
-data_is(2) <= (x"00", x"00", x"01", x"00");
-data_is(3) <= (x"00", x"00", x"00", x"01");
-en_s <= '1';
-wait;
-end process P0;
+    DUT : MixColumns port map(
+        data_i => data_is,
+        data_o => data_os,
+        en_i => en_s);
+
+    PUT : process
+    begin
+        round : for k in 0 to 10 loop
+            if k = 0 or k = 10 then
+                en_s <= '0';
+            else   
+                en_s <= '1';
+            end if;
+            data_is <= std_shiftrows_data_c(k);
+            data_es <= std_mixcolumns_data_c(k);
+            assert cond_s report "output differs from expected output" severity error;
+            wait for 100 ns;
+        end loop; -- round
+    end process PUT;
+    
+    cond_s <= data_os = data_es;
 
 end architecture;
 

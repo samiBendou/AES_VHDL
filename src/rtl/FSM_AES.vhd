@@ -15,6 +15,7 @@ entity FSM_AES is
 	   end_key_expander_i : in std_logic;
 	   enableMixcolumns_o : out std_logic;
 	   enableRoundcomputing_o : out std_logic;
+	   we_DataRegister_o : out std_logic;
 	   enableOutput_o : out std_logic;
 	   done_o : out std_logic);
 end FSM_AES;
@@ -86,50 +87,56 @@ begin
 			reset_key_expander_o <= '0';
 			start_key_expander_o <= '0';
 			round_key_expander_o <= X"0";
-			enableMixColumns_o <= '1';
+			enableMixColumns_o <= '0';
 			enableRoundcomputing_o <= '0';
 			enableOutput_o <= '0';
+			we_DataRegister_o <= '0';
 			done_o <= '0';
 		when hold =>
 			reset_key_expander_o <= '1';
 			start_key_expander_o <= '0';
 			round_key_expander_o <= X"0";
-			enableMixColumns_o <= '1';
+			enableMixColumns_o <= '0';
 			enableRoundcomputing_o <= '0';
-			enableOutput_o <= '0';
+			enableOutput_o <= '1';
 			done_o <= '0';
+			we_DataRegister_o <= '0';
 		when init =>
 			reset_key_expander_o <= '1';
 			start_key_expander_o <= '0';
 			round_key_expander_o <= X"0";
-			enableMixColumns_o <= '1';
+			enableMixColumns_o <= '0';
 			enableRoundcomputing_o <= '0';
 			enableOutput_o <= '0';
-			done_o <= '1';
+			done_o <= '0';
+			we_DataRegister_o <= '0';
 		when start_keyexpand =>
 			reset_key_expander_o <= '1';
 			start_key_expander_o <= '1';
 			round_key_expander_o <= X"0";
-			enableMixColumns_o <= '1';
+			enableMixColumns_o <= '0';
 			enableRoundcomputing_o <= '0';
 			enableOutput_o <= '0';
-			done_o <= '1';
+			done_o <= '0';
+			we_DataRegister_o <= '0';
 		when wait_keyexpand =>
 			reset_key_expander_o <= '1';
 			start_key_expander_o <= '0';
 			round_key_expander_o <= X"0";
-			enableMixColumns_o <= '1';
+			enableMixColumns_o <= '0';
 			enableRoundcomputing_o <= '0';
 			enableOutput_o <= '0';
-			done_o <= '1';
+			done_o <= '0';
+			we_DataRegister_o <= '0';
 		when round0 =>
 			reset_key_expander_o <= '1';
 			start_key_expander_o <= '0';
 			round_key_expander_o <= X"0";
-			enableMixColumns_o <= '1';
+			enableMixColumns_o <= '0';
 			enableRoundcomputing_o <= '0';
 			enableOutput_o <= '0';
-			done_o <= '1';
+			done_o <= '0';
+			we_DataRegister_o <= '1';
 		when roundn =>
 			reset_key_expander_o <= '1';
 			start_key_expander_o <= '0';
@@ -137,7 +144,8 @@ begin
 			enableMixColumns_o <= '1';
 			enableRoundcomputing_o <= '1';
 			enableOutput_o <= '0';
-			done_o <= '1';
+			done_o <= '0';
+			we_DataRegister_o <= '1';
 		when lastround =>
 			reset_key_expander_o <= '1';
 			start_key_expander_o <= '0';
@@ -145,7 +153,8 @@ begin
 			enableMixColumns_o <= '0';
 			enableRoundcomputing_o <= '1';
 			enableOutput_o <= '0';
-			done_o <= '1';
+			done_o <= '0';
+			we_DataRegister_o <= '1';
 		when done =>
 			reset_key_expander_o <= '1';
 			start_key_expander_o <= '0';
@@ -153,7 +162,8 @@ begin
 			enableMixColumns_o <= '0';
 			enableRoundcomputing_o <= '1';
 			enableOutput_o <= '1';
-			done_o <= '0';
+			done_o <= '1';
+			we_DataRegister_o <= '0';
 	end case;
 end process C1;
 

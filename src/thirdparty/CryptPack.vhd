@@ -9,6 +9,7 @@ use IEEE.STD_LOGIC_1164.all;
 package crypt_pack is
 	subtype bit4 is std_logic_vector(3 downto 0);
 	subtype bit8 is std_logic_vector(7 downto 0);
+	subtype bit11 is std_logic_vector(10 downto 0);
 	subtype bit16 is std_logic_vector(15 downto 0);
 	subtype bit32 is std_logic_vector(31 downto 0);
 	subtype bit128 is std_logic_vector(127 downto 0);

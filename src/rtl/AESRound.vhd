@@ -1,5 +1,6 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
+
 library lib_thirdparty;
 use lib_thirdparty.crypt_pack.all;
 
@@ -8,13 +9,12 @@ use lib_operations.all;
 
 entity AESRound is
 port(
-	text_i : in bit128;
-	currentkey_i : in bit128;
-	data_o : out bit128;
-	clock_i : in std_logic;
-	resetb_i : in std_logic;
-	enableMixcolumns_i : in std_logic;
-	enableRoundcomputing_i : in std_logic
+	data_i : in bit128;
+	key_i : in bit128;
+	en_mixcolumns_i : in std_logic;
+	en_round_i : in std_logic;
+	inv_i : in std_logic;
+	data_o : out bit128
 	);
 end entity AESRound;
 
@@ -54,65 +54,52 @@ architecture AESRound_arch of AESRound is
 	end component;
 
 	signal data_s, subbytes_s, shiftrows_s, mixcolumns_s, roundkey_s : type_state;
-	signal currentkey_s : type_state;
+	signal key_s : type_state;
 
 begin
+	row_conversion : for i in 0 to 3 generate
+		col_conversion : for j in 0 to 3 generate
+			data_s(i)(j) <= data_i(127-32*j-8*i downto 120-32*j-8*i);
+			data_o(127-32*j-8*i downto 120-32*j-8*i) <= roundkey_s(i)(j);
+			key_s(i)(j) <= key_i(127-32*j-8*i downto 120-32*j-8*i);
+		end generate;
+	end generate;
+
 	sub_bytes : SubBytes
 	port map(
 		data_i => data_s,
-		en_i => enableRoundcomputing_i,
-		inv_i => '0',
+		en_i => en_round_i,
+		inv_i => inv_i,
 		data_o => subbytes_s
 		);
 
 	shift_rows : ShiftRows
 	port map(
 		data_i => subbytes_s,
-		en_i => enableRoundcomputing_i,
-		inv_i => '0',
+		en_i => en_round_i,
+		inv_i => inv_i,
 		data_o => shiftrows_s
 		);
 
 	mix_columns : MixColumns
 	port map(
 		data_i => shiftrows_s,
-		en_i => enableMixColumns_i,
-		inv_i => '0',
+		en_i => en_mixcolumns_i,
+		inv_i => inv_i,
 		data_o => mixcolumns_s
 		);
 
 	add_roundkey : AddRoundkey
 	port map(
 		data_i => mixcolumns_s,
-		key_i => currentkey_s,
+		key_i => key_s,
 		en_i => '1',
 		data_o => roundkey_s
 		);
 
-	-- convert text on 128bits to type state
-	row_i : for i in 0 to 3 generate
-		col_i : for j in 0 to 3 generate
-			data_s(i)(j) <= text_i(127-32*j-8*i downto 120-32*j-8*i);
-		end generate;
-	end generate;
-
-	-- convert type state in 128bits vector
-	row_o : for i in 0 to 3 generate
-		col_o : for j in 0 to 3 generate
-			data_o(127-32*j-8*i downto 120-32*j-8*i) <= roundkey_s(i)(j);
-		end generate;
-	end generate;
-
-	-- convert current key to type state
-	row_key : for i in 0 to 3 generate
-		col_key : for j in 0 to 3 generate
-			currentkey_s(i)(j) <= currentkey_i(127-32*j-8*i downto 120-32*j-8*i);
-		end generate;
-	end generate;
-
 end architecture AESRound_arch;
 
-configuration AESRound_configuration of AESRound is
+configuration AESRound_conf of AESRound is
 for AESRound_arch
 	for all : SubBytes
 		use entity lib_operations.SubBytes(SubBytes_arch);

@@ -1,18 +1,18 @@
 --------------------------------------------------------------------------------
 -- @author DAHOUX Sami
 -- @date 21 Novembre 2017
--- @component KeyExpansion
+-- @component key_expansion
 --------------------------------------------------------------------------------
 
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 library lib_thirdparty;
 use lib_thirdparty.crypt_pack.all;
 use lib_thirdparty.all;
 
-entity KeyExpansion is
+entity key_expansion is
 	port( 
 		key_i : in bit128;
 		clock_i : in std_logic;
@@ -20,13 +20,13 @@ entity KeyExpansion is
 		start_i : in std_logic;
 		count_i : in bit4;
 		end_o : out std_logic;
-		key_o : out type_expanded_key
+		key_o : out keyexp_t
 		);
-end entity KeyExpansion;
+end entity key_expansion;
 
-architecture KeyExpansion_arch of KeyExpansion is
+architecture key_expansion_arch of key_expansion is
 
-	component KeyExpansion_FSM
+	component key_expansion_fsm
 	port (
 		clock_i : in std_logic;
 		resetb_i : in std_logic;
@@ -36,14 +36,14 @@ architecture KeyExpansion_arch of KeyExpansion is
 		we_key_o : out std_logic
 		);
 	end component;
-	component KeyExpander
+	component key_expander
 	port (
 		key_i : in bit128;
 		key_o : out bit128;
 		rcon_i : in bit8
 		);
 	end component;
-	component reg128
+	component state_reg
 	port (
 		data_i : in bit128;
 		resetb_i : in std_logic;
@@ -58,11 +58,11 @@ architecture KeyExpansion_arch of KeyExpansion is
 
 	signal rcon_s : bit8;
 	signal expander_is, expander_os : bit128;
-	signal key_s : type_expanded_key;
+	signal key_s : keyexp_t;
 	signal we_s : bit11;
 
 begin
-	rcon_s <= Rcon(to_integer(unsigned(count_i)));
+	rcon_s <= rcon_c(to_integer(unsigned(count_i)));
 	expander_is <= key_s(to_integer(unsigned(count_i)));
 	key_o <= key_s;
 
@@ -71,7 +71,7 @@ begin
 		we_s(k) <= '1' and we_key_s when count_i = std_logic_vector(to_unsigned(k - 1, 4)) else '0';	
     end generate ; -- we_seq
 
-	fsm: KeyExpansion_FSM port map (
+	fsm: key_expansion_fsm port map (
 		clock_i => clock_i,
 		resetb_i => resetb_i,
 		start_i => start_i,
@@ -80,7 +80,7 @@ begin
 		we_key_o => we_key_s
 		);
 
-	expander: KeyExpander 
+	expander: key_expander 
 	port map (
 		key_i => expander_is,
 		rcon_i => rcon_s,
@@ -89,7 +89,7 @@ begin
 		
 	key_register : for k in 0 to 10 generate
 		key_register0: if k = 0 generate
-			reg0: reg128
+			reg0: state_reg
 			port map(
 				data_i => key_i,
 				clock_i => clock_i,
@@ -99,7 +99,7 @@ begin
 				);
 		end generate;
 		key_registern : if k > 0 generate
-			reg: reg128
+			reg: state_reg
 			port map(
 				data_i => expander_os,
 				clock_i => clock_i,
@@ -109,4 +109,4 @@ begin
 				);
 		end generate;
 	end generate ; -- key_register
-end architecture KeyExpansion_arch;
+end architecture key_expansion_arch;

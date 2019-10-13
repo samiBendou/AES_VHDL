@@ -1,11 +1,11 @@
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 library lib_thirdparty;
 use lib_thirdparty.crypt_pack.all;
 
-entity counter11 is
+entity round_counter is
   port (
     clock_i : in std_logic;
     resetb_i : in std_logic;
@@ -13,11 +13,11 @@ entity counter11 is
     count_i : in bit4;
     count_o : out bit4
   );
-end counter11;
+end round_counter;
 
-architecture counter11_arch of counter11 is
+architecture round_counter_arch of round_counter is
 
-  signal count_s : integer range 0 to 11;
+  signal count_s : integer range 0 to 10;
 
 begin
 
@@ -36,4 +36,4 @@ begin
     end if;
   end process ; -- count
 
-end counter11_arch ; -- counter11_arch
+end round_counter_arch ; -- round_counter_arch

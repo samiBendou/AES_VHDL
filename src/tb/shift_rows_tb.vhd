@@ -1,37 +1,37 @@
 --------------------------------------------------------------------------------
 -- @author DAHOUX Sami
 -- @date 27 Octobre 2017
--- @component ShiftRows_tb
+-- @component shift_rows_tb
 --------------------------------------------------------------------------------
 
-library IEEE;
-library lib_operations;
+library ieee;
+library lib_round;
 library lib_thirdparty;
 
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
-use IEEE.STD_LOGIC_UNSIGNED.ALL;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use ieee.STD_LOGIC_UNSIGNED.ALL;
 use lib_thirdparty.crypt_pack.all;
-use lib_operations.all;
+use lib_round.all;
 
-entity ShiftRows_tb is
-end entity ShiftRows_tb;
+entity shift_rows_tb is
+end entity shift_rows_tb;
 
-architecture ShiftRows_tb_arch of ShiftRows_tb is
-    signal data_is : type_state;
-    signal data_os : type_state;
+architecture shift_rows_tb_arch of shift_rows_tb is
+    signal data_is : state_t;
+    signal data_os : state_t;
 
-    component ShiftRows 
+    component shift_rows 
     port(
-        data_i : in type_state;
+        data_i : in state_t;
         en_i : in std_logic;
         inv_i : in std_logic;
-        data_o : out type_state
+        data_o : out state_t
         );
     end component;
 
 begin
-    DUT: ShiftRows
+    DUT: shift_rows
     port map(
         data_i => data_is,
         en_i => '1',
@@ -48,12 +48,12 @@ begin
     wait;
     end process PUT;
 
-end architecture ShiftRows_tb_arch;
+end architecture shift_rows_tb_arch;
 
-configuration ShiftRows_tb_conf of ShiftRows_tb is
-for ShiftRows_tb_arch
-    for DUT : ShiftRows
-        use entity lib_operations.ShiftRows(ShiftRows_arch);
+configuration shift_rows_tb_conf of shift_rows_tb is
+for shift_rows_tb_arch
+    for DUT : shift_rows
+        use entity lib_round.shift_rows(shift_rows_arch);
     end for;
 end for;
 end configuration;

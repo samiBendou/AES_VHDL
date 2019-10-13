@@ -1,26 +1,27 @@
  --------------------------------------------------------------------------------
 -- @author DAHOUX Sami
 -- @date 16 Décembre 2017
--- @component AddRoundKey
+-- @component add_roundkey
 --------------------------------------------------------------------------------
 
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 library lib_thirdparty;
 use lib_thirdparty.crypt_pack.all;
 
-entity AddRoundKey is
+entity add_roundkey is
     port (
-        data_i: in type_state;
-        key_i: in type_state;
+        data_i: in state_t;
+        key_i: in state_t;
         en_i: in std_logic;
-        data_o: out type_state);
-end entity AddRoundKey;
+        data_o: out state_t);
+end entity add_roundkey;
 
-architecture AddRoundKey_arch of AddRoundKey is
+architecture add_roundkey_arch of add_roundkey is
 
-    signal data_s : type_state;
+    signal data_s : state_t;
+    
 begin
     data_o <= data_s when en_i = '1' else data_i;
         
@@ -30,4 +31,4 @@ begin
         end generate;
     end generate;
 
-end architecture AddRoundKey_arch;
+end architecture add_roundkey_arch;

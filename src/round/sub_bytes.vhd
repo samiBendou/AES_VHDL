@@ -1,33 +1,28 @@
 --------------------------------------------------------------------------------
 -- @author DAHOUX Sami
 -- @date 27 Octobre 2017
--- @component SubBytes
+-- @component sub_bytes
 --------------------------------------------------------------------------------
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 library lib_thirdparty;
 use lib_thirdparty.crypt_pack.all;
 
-library lib_operations;
-use lib_operations.all;
+library lib_round;
+use lib_round.all;
 
-entity SubBytes is
+entity sub_bytes is
     port (
-        data_i: in type_state;
+        data_i: in state_t;
         en_i: in std_logic;
         inv_i: in std_logic;
-        data_o: out type_state);
-end entity SubBytes;
+        data_o: out state_t);
+end entity sub_bytes;
 
-architecture SubBytes_arch of SubBytes is
-
-    component SBox
-        port(sbox_i : in bit8;
-            sbox_o : out bit8);
-    end component;
-
-    signal data_s, data_inv_s : type_state;
+architecture sub_bytes_arch of sub_bytes is
+    
+    signal data_s, data_inv_s : state_t;
 
 begin
     data_o <= data_s when inv_i = '0' and en_i = '1' else
@@ -40,4 +35,4 @@ begin
             data_inv_s(i)(j) <= inv_sbox_c(to_integer(unsigned(data_i(i)(j))));
         end generate col;
     end generate row;
-end SubBytes_arch;
+end sub_bytes_arch;

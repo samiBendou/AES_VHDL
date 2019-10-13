@@ -1,37 +1,37 @@
 --------------------------------------------------------------------------------
 -- @author DAHOUX Sami
 -- @date 27 Octobre 2017
--- @component SubBytes_tb
+-- @component sub_bytes_tb
 --------------------------------------------------------------------------------
 
-library IEEE;
-library lib_operations;
+library ieee;
+library lib_round;
 library lib_thirdparty;
 
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
-use IEEE.STD_LOGIC_UNSIGNED.ALL;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use ieee.STD_LOGIC_UNSIGNED.ALL;
 use lib_thirdparty.crypt_pack.all;
-use lib_operations.all;
+use lib_round.all;
 
-entity SubBytes_tb is
+entity sub_bytes_tb is
 end entity;
 
-architecture SubBytes_tb_arch of SubBytes_tb is
+architecture sub_bytes_tb_arch of sub_bytes_tb is
 
-	component SubBytes
+	component sub_bytes
 	port (
-		data_i : in type_state;
+		data_i : in state_t;
 		en_i : in std_logic;
 		inv_i : in std_logic;
-		data_o : out type_state
+		data_o : out state_t
 		);
 	end component;
 
-	signal data_is, data_os : type_state;
+	signal data_is, data_os : state_t;
 
 begin
-	DUT : SubBytes
+	DUT : sub_bytes
 	port map (
 		data_i => data_is,
 		en_i => '1',
@@ -55,12 +55,12 @@ begin
 		end loop;
 	end process PUT;
 
-end architecture SubBytes_tb_arch;
+end architecture sub_bytes_tb_arch;
 
-configuration SubBytes_tb_conf of SubBytes_tb is
-for SubBytes_tb_arch
-    for DUT : SubBytes
-        use entity lib_operations.SubBytes(SubBytes_arch);
+configuration sub_bytes_tb_conf of sub_bytes_tb is
+for sub_bytes_tb_arch
+    for DUT : sub_bytes
+        use entity lib_round.sub_bytes(sub_bytes_arch);
     end for;
 end for;
 end configuration;

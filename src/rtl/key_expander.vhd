@@ -1,31 +1,31 @@
 --------------------------------------------------------------------------------
 -- @author DAHOUX Sami
 -- @date 21 Novembre 2017
--- @component KeyExpander
+-- @component key_expander
 --------------------------------------------------------------------------------
 
 
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 library lib_thirdparty;
 use lib_thirdparty.crypt_pack.all;
 
-entity KeyExpander is
+entity key_expander is
 port (
 	key_i : in bit128;
 	key_o : out bit128;
 	rcon_i : in bit8);
-end entity KeyExpander;
+end entity key_expander;
 
-architecture KeyExpander_arch of KeyExpander is
+architecture key_expander_arch of key_expander is
 
-	signal key_i_s : type_word;
-	signal key_rot_s : type_word;
-	signal key_sub_s : type_word;
-	signal key_xor_s : type_word;
-	signal rcon_s : column_state;
+	signal key_i_s : word_t;
+	signal key_rot_s : word_t;
+	signal key_sub_s : word_t;
+	signal key_xor_s : word_t;
+	signal rcon_s : col_state_t;
 
 begin
 	--Transformation de l'entrée en tableau state_t
@@ -36,7 +36,7 @@ begin
 		end generate raw_out;
 	end generate col_out;
 
-	--Transformation of Rcon to column_state.
+	--Transformation of rcon_c to col_state_t.
 	rcon_s(0) <= rcon_i;
 	rcon_s(1) <= x"00";
 	rcon_s(2) <= x"00";
@@ -48,7 +48,7 @@ begin
 	key_rot_s(0)(1) <= key_i_s(3)(2);
 	key_rot_s(0)(2) <= key_i_s(3)(3);
 
-	--SubBytes over 4 bytes
+	--sub_bytes over 4 bytes
 	key_sub_s(0)(0) <= sbox_c(to_integer(unsigned(key_rot_s(0)(0))));
 	key_sub_s(0)(1) <= sbox_c(to_integer(unsigned(key_rot_s(0)(1))));
 	key_sub_s(0)(2) <= sbox_c(to_integer(unsigned(key_rot_s(0)(2))));
@@ -59,4 +59,4 @@ begin
 	key_xor_s(2) <= key_i_s(2) xor key_xor_s(1);
 	key_xor_s(3) <= key_i_s(3) xor key_xor_s(2);
 
-end architecture KeyExpander_arch;
+end architecture key_expander_arch;

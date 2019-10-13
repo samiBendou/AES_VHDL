@@ -1,13 +1,13 @@
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.std_logic_arith.all;
-use IEEE.std_logic_unsigned.all;
-use IEEE.numeric_std.all;
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.std_logic_arith.all;
+use ieee.std_logic_unsigned.all;
+use ieee.numeric_std.all;
 
 library lib_thirdparty;
 use lib_thirdparty.crypt_pack.all;
 
-entity FSM_AES is
+entity aes_fsm is
 port ( 
 	resetb_i : in  std_logic;
 	clock_i : in  std_logic;
@@ -23,17 +23,17 @@ port (
 	data_src_o : out std_logic;
 	done_o : out std_logic
 	);
-end FSM_AES;
+end aes_fsm;
 
-architecture FSM_AES_arch  of FSM_AES is
+architecture aes_fsm_arch  of aes_fsm is
 
-	type state_type is (reset, hold, init, start_keyexp, load_keyexp, round0, roundn, lastround, done);
-	signal current_state, next_state : state_type;
+	type aes_state_t is (reset, hold, init, start_keyexp, load_keyexp, round0, roundn, lastround, done);
+	signal current_state, next_state : aes_state_t;
 
 begin
 	state_register : process( clock_i, resetb_i )
 	begin
-		if resetb_i = '0' then
+		if resetb_i =	 '0' then
 			current_state <= reset;
 		elsif rising_edge(clock_i) then
 			current_state <= next_state;
@@ -161,4 +161,4 @@ begin
 		end case;
 	end process out_comb;
 
-end FSM_AES_arch;
+end aes_fsm_arch;

@@ -1,38 +1,38 @@
 --------------------------------------------------------------------------------
 -- @author DAHOUX Sami
 -- @date 16 Décembre 2017
--- @component AddRoundKey_tb
+-- @component add_roundkey_tb
 --------------------------------------------------------------------------------
 
-library IEEE;
-library lib_operations;
+library ieee;
+library lib_round;
 library lib_thirdparty;
 
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
-use IEEE.STD_LOGIC_UNSIGNED.ALL;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use ieee.STD_LOGIC_UNSIGNED.ALL;
 use lib_thirdparty.crypt_pack.all;
-use lib_operations.all;
+use lib_round.all;
 
-entity AddRoundKey_tb is
+entity add_roundkey_tb is
 end entity;
 
-architecture AddRoundKey_tb_arch of AddRoundKey_tb is
-    signal data_is : type_state;
-    signal data_os : type_state;
-    signal key_is : type_state;
+architecture add_roundkey_tb_arch of add_roundkey_tb is
+    signal data_is : state_t;
+    signal data_os : state_t;
+    signal key_is : state_t;
 
-    component AddRoundKey
+    component add_roundkey
         port(
-            data_i: in type_state;
-            key_i: in type_state;
+            data_i: in state_t;
+            key_i: in state_t;
             en_i: in std_logic;
-            data_o: out type_state);
+            data_o: out state_t);
     end component;
 
     begin
 
-    DUT: AddRoundKey port map(
+    DUT: add_roundkey port map(
         data_i => data_is,
         key_i => key_is,
         en_i => '1',
@@ -50,13 +50,13 @@ architecture AddRoundKey_tb_arch of AddRoundKey_tb is
     wait;
     end process PUT;
 
-end architecture AddRoundKey_tb_arch;
+end architecture add_roundkey_tb_arch;
 
 
-configuration AddRoundKey_tb_conf of AddRoundKey_tb is
-for AddRoundKey_tb_arch
-    for DUT : AddRoundKey
-        use entity lib_operations.AddRoundKey(AddRoundKey_arch);
+configuration add_roundkey_tb_conf of add_roundkey_tb is
+for add_roundkey_tb_arch
+    for DUT : add_roundkey
+        use entity lib_round.add_roundkey(add_roundkey_arch);
     end for;
 end for;
 end configuration;

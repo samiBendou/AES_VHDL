@@ -1,11 +1,11 @@
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 library lib_thirdparty;
 use lib_thirdparty.crypt_pack.all;
 
-entity AES is
+entity aes is
 port(	
     data_i : in bit128;
 	key_i : in  bit128;
@@ -16,11 +16,11 @@ port(
 	data_o : out bit128;
 	done_o : out std_logic
 	);
-end entity AES;
+end entity aes;
 
-architecture AES_arch of AES is
+architecture aes_arch of aes is
 
-	component KeyExpansion
+	component key_expansion
 	port ( 
 		key_i : in bit128;
 		clock_i : in std_logic;
@@ -28,10 +28,10 @@ architecture AES_arch of AES is
 		start_i : in std_logic;
 		count_i : in bit4;
 		end_o : out std_logic;
-		key_o : out type_expanded_key
+		key_o : out keyexp_t
 		);
 	end component;
-	component FSM_AES
+	component aes_fsm
 	port ( 
 		resetb_i : in  std_logic;
 		clock_i : in  std_logic;
@@ -48,7 +48,7 @@ architecture AES_arch of AES is
 		done_o : out std_logic
 		);
 	end component;
-	component AESRound
+	component aes_round
 	port(	
 		data_i : in bit128;
 		key_i : in bit128;
@@ -58,7 +58,7 @@ architecture AES_arch of AES is
 		data_o : out bit128
 		);
 	end component;
-	component counter11
+	component round_counter
 	port(
 		clock_i : in std_logic;
 		resetb_i : in std_logic;
@@ -67,7 +67,7 @@ architecture AES_arch of AES is
 		count_o : out bit4
 	);
 	end component;
-	component reg128
+	component state_reg
 	port(
 		data_i : in bit128;
 		resetb_i : in std_logic;
@@ -92,7 +92,7 @@ architecture AES_arch of AES is
 	signal count_s : bit4;
 	signal data_s, round_data_s, reg_data_s : bit128;
 	signal key_s : bit128;
-	signal keyexp_s : type_expanded_key;
+	signal keyexp_s : keyexp_t;
 	
 begin
 	resetb_s <= not reset_i;
@@ -100,7 +100,7 @@ begin
 	data_o <= reg_data_s when en_out_s = '1' else (others => '0');
 	data_s <= data_i when data_src_s = '1' else round_data_s;
 
-	reg : reg128
+	reg : state_reg
 	port map(
 		data_i => data_s,
 		resetb_i => resetb_s,
@@ -109,7 +109,7 @@ begin
 		data_o => reg_data_s
 	);
 
-	keyexp : KeyExpansion
+	keyexp : key_expansion
 	port map(
 		key_i => key_i,
 		clock_i => clock_i,
@@ -120,7 +120,7 @@ begin
 	   	key_o => keyexp_s
        	);
 
-	fsm : FSM_AES
+	fsm : aes_fsm
 	port map(
 		resetb_i => resetb_s,
 		clock_i => clock_i,
@@ -137,7 +137,7 @@ begin
 		done_o => done_o
 		);
 
-	round : AESRound
+	round : aes_round
 	port map(
 		data_i => reg_data_s,
 		key_i => key_s,
@@ -147,7 +147,7 @@ begin
 		data_o => round_data_s
 		);
 
-	count : counter11
+	count : round_counter
 	port map(
 		clock_i => clock_i,
 		resetb_i => resetb_s,
@@ -156,4 +156,4 @@ begin
 		count_o => count_s
 		);
 
-end architecture AES_arch;
+end architecture aes_arch;

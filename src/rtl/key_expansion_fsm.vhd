@@ -1,16 +1,17 @@
 --------------------------------------------------------------------------------
 -- @author DAHOUX Sami
 -- @date 21 Novembre 2017
--- @component KeyExpansion_FSM
+-- @component key_expansion_fsm
 --------------------------------------------------------------------------------
 
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
 library lib_thirdparty;
 use lib_thirdparty.crypt_pack.all;
 
-entity KeyExpansion_FSM is
+entity key_expansion_fsm is
 port (
 	clock_i : in std_logic;
 	resetb_i : in std_logic;
@@ -19,13 +20,13 @@ port (
 	end_o : out std_logic;
 	we_key_o : out std_logic
 	);
-end entity KeyExpansion_FSM;
+end entity key_expansion_fsm;
 
-architecture KeyExpansion_FSM_arch of KeyExpansion_FSM is
+architecture key_expansion_fsm_arch of key_expansion_fsm is
 
-	type state_type is (reset, hold, start, compute, done);
+	type keyexp_state_t is (reset, hold, start, compute, done);
 
-	signal current_state, next_state : state_type;
+	signal current_state, next_state : keyexp_state_t;
 
 begin
 
@@ -80,4 +81,4 @@ begin
 		end case;
 	end process out_comb;
 
-end architecture KeyExpansion_FSM_arch;
+end architecture key_expansion_fsm_arch;

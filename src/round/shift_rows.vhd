@@ -1,26 +1,26 @@
 --------------------------------------------------------------------------------
 -- @author DAHOUX Sami
 -- @date 27 Octobre 2017
--- @component ShiftRows
+-- @component shift_rows
 --------------------------------------------------------------------------------
 
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 library lib_thirdparty;
 use lib_thirdparty.crypt_pack.all;
 
-entity ShiftRows is
+entity shift_rows is
     port (
-		data_i: in type_state;
+		data_i: in state_t;
 		en_i : in std_logic;
 		inv_i : in std_logic;
-        data_o: out type_state);
-end entity ShiftRows;
+        data_o: out state_t);
+end entity shift_rows;
 
-architecture ShiftRows_arch of ShiftRows is
+architecture shift_rows_arch of shift_rows is
 
-	signal data_s, data_inv_s : type_state;
+	signal data_s, data_inv_s : state_t;
 
 begin
     data_o <= data_s when inv_i = '0' and en_i = '1' else
@@ -35,4 +35,4 @@ begin
 		end generate;
 	end generate;
 
-end architecture ShiftRows_arch;
+end architecture shift_rows_arch;

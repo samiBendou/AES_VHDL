@@ -1,7 +1,7 @@
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
-use IEEE.std_logic_unsigned.ALL;
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use ieee.std_logic_unsigned.ALL;
 
 library lib_thirdparty;
 use lib_thirdparty.crypt_pack.all;
@@ -9,12 +9,12 @@ use lib_thirdparty.crypt_pack.all;
 library lib_rtl;
 use lib_rtl.all;
 
-entity AES_tb is
-end entity AES_tb;
+entity aes_tb is
+end entity aes_tb;
 
-architecture AES_tb_arch of AES_tb is
+architecture aes_tb_arch of aes_tb is
 
-	component AES
+	component aes
 	port(	
 		data_i : in bit128;
 		key_i : in  bit128;
@@ -42,7 +42,7 @@ begin
 	reset_s <= '1', '0' after 100 ns;
 	clock_s <= not clock_s after 50 ns;
 
-	DUT : AES
+	DUT : aes
 	port map(
 		clock_i => clock_s,
 		reset_i => reset_s,
@@ -66,22 +66,22 @@ begin
 		wait for 120 ns;
 	end process PUT;
 
-end architecture AES_tb_arch;
+end architecture aes_tb_arch;
 
-configuration AES_tb_configuration of AES_tb is
-for AES_tb_arch
-	for DUT : AES
-		for AES_arch
-			for all : KeyExpansion
-				use entity lib_rtl.KeyExpansion(KeyExpansion_arch);
+configuration aes_tb_conf of aes_tb is
+for aes_tb_arch
+	for DUT : aes
+		for aes_arch
+			for all : key_expansion
+				use entity lib_rtl.key_expansion(key_expansion_arch);
 			end for;
-			for all : FSM_AES
-				use entity lib_rtl.FSM_AES(FSM_AES_arch);
+			for all : aes_fsm
+				use entity lib_rtl.aes_fsm(aes_fsm_arch);
 			end for;
-			for all : AESRound
-				use entity lib_rtl.AESRound(AESRound_arch);
+			for all : aes_round
+				use entity lib_rtl.aes_round(aes_round_arch);
 			end for;
 		end for;
 	end for;
 end for;
-end configuration AES_tb_configuration;
+end configuration aes_tb_conf;

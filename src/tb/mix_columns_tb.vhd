@@ -1,42 +1,42 @@
 --------------------------------------------------------------------------------
 -- @author DAHOUX Sami
 -- @date 16 Décembre 2017
--- @component MixColumns_tb
+-- @component mix_columns_tb
 --------------------------------------------------------------------------------
 
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
-use IEEE.STD_LOGIC_UNSIGNED.ALL;
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use ieee.STD_LOGIC_UNSIGNED.ALL;
 
 library lib_thirdparty;
 use lib_thirdparty.crypt_pack.all;
 
-library lib_operations;
-use lib_operations.all;
+library lib_round;
+use lib_round.all;
 
-entity MixColumns_tb is
+entity mix_columns_tb is
 end entity;
 
-architecture MixColumns_tb_arch of MixColumns_tb is
+architecture mix_columns_tb_arch of mix_columns_tb is
 
-    component MixColumns
+    component mix_columns
     port(
-        data_i : in type_state;
-        data_o : out type_state;
+        data_i : in state_t;
+        data_o : out state_t;
         en_i : in std_logic;
         inv_i : in std_logic
         );
     end component;
 
-    signal data_is : type_state;
-    signal data_os : type_state;
-    signal data_es : type_state;
+    signal data_is : state_t;
+    signal data_os : state_t;
+    signal data_es : state_t;
     signal en_s : std_logic;
     signal cond_s : boolean;
 
 begin
-    DUT : MixColumns 
+    DUT : mix_columns 
     port map(
         data_i => data_is,
         data_o => data_os,
@@ -52,8 +52,8 @@ begin
             else   
                 en_s <= '1';
             end if;
-            data_is <= std_shiftrows_data_c(k);
-            data_es <= std_mixcolumns_data_c(k);
+            data_is <= std_shift_rows_data_c(k);
+            data_es <= std_mix_columns_data_c(k);
             assert cond_s report "output differs from expected output" severity error;
             wait for 100 ns;
         end loop; -- round
@@ -63,10 +63,10 @@ begin
 
 end architecture;
 
-configuration MixColumns_tb_conf of MixColumns_tb is
-for MixColumns_tb_arch
-    for DUT : MixColumns
-        use entity lib_operations.MixColumns(MixColumns_arch);
+configuration mix_columns_tb_conf of mix_columns_tb is
+for mix_columns_tb_arch
+    for DUT : mix_columns
+        use entity lib_round.mix_columns(mix_columns_arch);
     end for;
 end for;
 end configuration;

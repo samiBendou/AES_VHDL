@@ -23,9 +23,10 @@ end entity KeyExpansion_FSM;
 
 architecture KeyExpansion_FSM_arch of KeyExpansion_FSM is
 
-	type state_type is (reset, hold, compute, done);
+	type state_type is (reset, hold, start, compute, done);
+
 	signal current_state, next_state : state_type;
-	signal count_s : integer range 0 to 10;
+	signal count_s : integer range 0 to 11;
 
 begin
 	state_register : process ( clock_i, resetb_i ) is
@@ -34,8 +35,8 @@ begin
 			current_state <= reset;
 		elsif rising_edge(clock_i) then
 			if start_i = '1' then
-				count_s <= 1;
-			else 
+				count_s <= 0;
+			elsif current_state = compute then
 				count_s <= count_s + 1;
 			end if;
 
@@ -43,19 +44,21 @@ begin
 		end if;
 	end process state_register;
 
-	state_comb : process( current_state, start_i )
+	state_comb : process( current_state, start_i, count_s )
 	begin
 		case current_state is
 			when reset =>
 				next_state <= hold;
 			when hold => 
 				if start_i = '1' then
-					next_state <= compute;
+					next_state <= start;
 				else
 					next_state <= hold;
 				end if;
+			when start =>
+					next_state <= compute;
 			when compute =>
-				if count_s = 9 then
+				if count_s = 10 then
 					next_state <= done;
 				else
 					next_state <= compute;
@@ -68,14 +71,14 @@ begin
 	out_comb : process( current_state, count_s )
 	begin
 		case current_state is
-			when reset =>
+			when reset | hold =>
 				end_o <= '0';
 				we_key_o <= '0';
 				count_o <= x"0";
-			when hold =>
+			when start =>
 				end_o <= '0';
 				we_key_o <= '1';
-				count_o <= x"0";
+				count_o <= std_logic_vector(to_unsigned(count_s, 4));
 			when compute =>
 				end_o <= '0';
 				we_key_o <= '1';

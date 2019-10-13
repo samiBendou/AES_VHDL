@@ -75,9 +75,9 @@ begin
 	expander_is <= key_s(to_integer(unsigned(count_s)));
 	key_o <= key_s;
 
-	we_s(0) <= '1' and we_key_s;
+	we_s(0) <= '1' and we_key_s when count_s = x"0" else '0';
 	we_seq : for k in 1 to 10 generate
-		we_s(k) <= ('1' and we_key_s) when count_s = std_logic_vector(to_unsigned(k - 1, 4)) else '0';	
+		we_s(k) <= '1' and we_key_s when count_s = std_logic_vector(to_unsigned(k - 1, 4)) else '0';	
 	end generate ; -- we_seq
 
 	fsm: KeyExpansion_FSM port map (

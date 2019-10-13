@@ -38,9 +38,9 @@ begin
 			current_state <= reset;
 		elsif rising_edge(clock_i) then
 			current_state <= next_state;
-			if (current_state = round0) then
+			if current_state = round0 then
 				count_s <= 1;
-			elsif (current_state = roundn) then
+			elsif current_state = roundn then
 				count_s <= count_s + 1;
 			end if;
 		end if;
@@ -92,7 +92,7 @@ begin
 			when reset =>
 				resetb_keyexp_o <= '0';
 				start_keyexp_o <= '0';
-				round_o <= X"0";
+				round_o <= x"0";
 				en_mixcolumns_o <= '0';
 				en_round_o <= '0';
 				en_out_o <= '0';
@@ -101,7 +101,7 @@ begin
 			when hold =>
 				resetb_keyexp_o <= '1';
 				start_keyexp_o <= '0';
-				round_o <= X"0";
+				round_o <= x"0";
 				en_mixcolumns_o <= '0';
 				en_round_o <= '0';
 				en_out_o <= '1';
@@ -110,7 +110,7 @@ begin
 			when init =>
 				resetb_keyexp_o <= '1';
 				start_keyexp_o <= '0';
-				round_o <= X"0";
+				round_o <= x"0";
 				en_mixcolumns_o <= '0';
 				en_round_o <= '0';
 				en_out_o <= '0';
@@ -119,7 +119,7 @@ begin
 			when start_keyexpand =>
 				resetb_keyexp_o <= '1';
 				start_keyexp_o <= '1';
-				round_o <= X"0";
+				round_o <= x"0";
 				en_mixcolumns_o <= '0';
 				en_round_o <= '0';
 				en_out_o <= '0';
@@ -128,7 +128,7 @@ begin
 			when wait_keyexpand =>
 				resetb_keyexp_o <= '1';
 				start_keyexp_o <= '0';
-				round_o <= X"0";
+				round_o <= x"0";
 				en_mixcolumns_o <= '0';
 				en_round_o <= '0';
 				en_out_o <= '0';
@@ -137,7 +137,7 @@ begin
 			when round0 =>
 				resetb_keyexp_o <= '1';
 				start_keyexp_o <= '0';
-				round_o <= std_logic_vector(to_unsigned(count_s, 4));
+				round_o <= x"0";
 				en_mixcolumns_o <= '0';
 				en_round_o <= '0';
 				en_out_o <= '0';
@@ -164,7 +164,7 @@ begin
 			when done =>
 				resetb_keyexp_o <= '1';
 				start_keyexp_o <= '0';
-				round_o <= std_logic_vector(to_unsigned(count_s, 4));
+				round_o <= x"0";
 				en_mixcolumns_o <= '0';
 				en_round_o <= '1';
 				en_out_o <= '1';

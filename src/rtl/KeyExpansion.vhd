@@ -4,74 +4,118 @@
 -- @component KeyExpansion
 --------------------------------------------------------------------------------
 
-
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
+
 library lib_thirdparty;
 use lib_thirdparty.crypt_pack.all;
-
+use lib_thirdparty.all;
 
 entity KeyExpansion is
-port (
-	key_i : in bit128;
-	key_o : out bit128;
-	rcon_i : in bit8);
+	port( 
+		key_i : in bit128;
+		clock_i : in std_logic;
+		resetb_i : in std_logic;
+		start_i : in std_logic;
+		end_o : out std_logic;
+		key_o : out type_expanded_key
+		);
 end entity KeyExpansion;
 
 architecture KeyExpansion_arch of KeyExpansion is
 
-signal key_i_s : type_word;
-signal key_rot_s : type_word;
-signal key_sub_s : type_word;
-signal key_xor_s : type_word;
-signal rcon_s : column_state;
+	component Counter
+	port (
+		clock_i : in std_logic;
+		resetb_i : in std_logic;
+		en_i : in std_logic;
+		count_i : in bit4;
+		count_o : out bit4
+		);
+	end component;
+	component KeyExpansion_FSM
+	port (
+		clock_i : in std_logic;
+		resetb_i : in std_logic;
+		start_i : in std_logic;
+		end_o : out std_logic;
+		we_key_o : out std_logic;
+		count_o : out bit4
+		);
+	end component;
+	component KeyExpander
+	port (
+		key_i : in bit128;
+		key_o : out bit128;
+		rcon_i : in bit8
+		);
+	end component;
+	component reg128
+	port (
+		data_i : in bit128;
+		resetb_i : in std_logic;
+		clock_i : in std_logic;
+		we_i : in std_logic;
+		data_o : out bit128
+		);
+	end component;
 
+	signal en_s : std_logic;
+	signal we_key_s : std_logic;
+	signal count_s : bit4;
 
-component SBOX
-    port(sbox_i : in bit8;
-         sbox_o : out bit8);
-end component;
+	signal rcon_s : bit8;
+	signal expander_is, expander_os : bit128;
+	signal key_s : type_expanded_key;
+	signal we_s : bit11;
 
---Transformation de l'entrée en tableau state_t
 begin
-col_in : for j in 0 to 3 generate
-	raw_in : for i in 0 to 3 generate
-		key_i_s(i)(j) <= key_i(127-32*i-8*j downto 120-32*i-8*j);
-	end generate raw_in;
-end generate col_in;
+	rcon_s <= Rcon(to_integer(unsigned(count_s)));
+	expander_is <= key_s(to_integer(unsigned(count_s)));
+	key_o <= key_s;
 
---Transformation de Rcon en column_state.
-rcon_s(0) <= rcon_i;
-rcon_s(1) <= x"00";
-rcon_s(2) <= x"00";
-rcon_s(3) <= x"00";
+	we_s(0) <= '1' and we_key_s when count_s = x"0" else '0';
+	we_seq : for k in 1 to 10 generate
+		we_s(k) <= '1' and we_key_s when count_s = std_logic_vector(to_unsigned(k - 1, 4)) else '0';	
+	end generate ; -- we_seq
 
---RotWord
-key_rot_s(0)(3) <= key_i_s(3)(0);
-key_rot_s(0)(0) <= key_i_s(3)(1);
-key_rot_s(0)(1) <= key_i_s(3)(2);
-key_rot_s(0)(2) <= key_i_s(3)(3);
+	fsm: KeyExpansion_FSM port map (
+		clock_i => clock_i,
+		resetb_i => resetb_i,
+		start_i => start_i,
+		end_o => end_o,
+		we_key_o => we_key_s,
+		count_o => count_s
+		);
 
---SubBytes sur 4 octets
-raw_sub : for i in 0 to 3 generate
-	inter_sbox: SBOX port map (
-		sbox_i => key_rot_s(0)(i),
-		sbox_o => key_sub_s(0)(i)
-	);
-end generate raw_sub;
+	expander: KeyExpander 
+	port map (
+		key_i => expander_is,
+		rcon_i => rcon_s,
+		key_o => expander_os
+		);
 
---XOR
-key_xor_s(0) <= rcon_s xor (key_sub_s(0) xor key_i_s(0));
-key_xor_s(1) <= key_i_s(1) xor key_xor_s(0);
-key_xor_s(2) <= key_i_s(2) xor key_xor_s(1);
-key_xor_s(3) <= key_i_s(3) xor key_xor_s(2);
-
---Transformation de la sortie en vecteur de 128 bits
-col_out : for j in 0 to 3 generate
-	raw_out : for i in 0 to 3 generate
-		key_o(127-32*i-8*j downto 120-32*i-8*j) <= key_xor_s(i)(j);
-	end generate raw_out;
-end generate col_out;
-
+	key_register : for k in 0 to 10 generate
+		key_register0: if k = 0 generate
+			reg0: reg128
+			port map(
+				data_i => key_i,
+				clock_i => clock_i,
+				resetb_i => resetb_i,
+				we_i => we_s(0),
+				data_o => key_s(0)
+				);
+		end generate;
+		key_registern : if k > 0 generate
+			reg: reg128
+			port map(
+				data_i => expander_os,
+				clock_i => clock_i,
+				resetb_i => resetb_i,
+				we_i => we_s(k),
+				data_o => key_s(k)
+				);
+		end generate;
+	end generate ; -- key_register
 end architecture KeyExpansion_arch;

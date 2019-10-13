@@ -36,18 +36,16 @@ architecture AES_arch of AES is
 		resetb_i : in  std_logic;
 		clock_i : in  std_logic;
 		start_i : in  std_logic;
-		end_keyexp_i : in std_logic;
 		count_i : in bit4;
-		resetb_keyexp_o : out std_logic;
-		resetb_count_o : out std_logic;
+		end_keyexp_i : in std_logic;
 		start_keyexp_o : out std_logic;
 		en_mixcolumns_o : out std_logic;
 		en_round_o : out std_logic;
 		en_out_o : out std_logic;
 		en_count_o : out std_logic;
 		we_data_o : out std_logic;
-		done_o : out std_logic;
-		init_count_o : out bit4
+		data_src_o : out std_logic;
+		done_o : out std_logic
 		);
 	end component;
 	component AESRound
@@ -69,52 +67,54 @@ architecture AES_arch of AES is
 		count_o : out bit4
 	);
 	end component;
+	component reg128
+	port(
+		data_i : in bit128;
+		resetb_i : in std_logic;
+		clock_i : in std_logic;
+		we_i : in std_logic;
+		data_o : out bit128
+	);
+	end component;
 
 	signal resetb_s : std_logic;
-	signal resetb_count_s : std_logic;
-	signal resetb_keyexp_s : std_logic;
 
 	signal en_mixcolumns_s : std_logic;
 	signal en_round_s : std_logic;
 	signal en_count_s : std_logic;
 	signal en_out_s : std_logic;
 	signal we_data_s : std_logic;
-	
+	signal data_src_s : std_logic;
+
 	signal start_keyexp_s : std_logic;
 	signal end_keyexp_s : std_logic;
-	signal init_count_s : bit4;
 
 	signal count_s : bit4;
-	signal data_is, data_os : bit128;
+	signal data_s, round_data_s, reg_data_s : bit128;
 	signal key_s : bit128;
 	signal keyexp_s : type_expanded_key;
-	signal round_s : integer range 0 to 10;
 	
 begin
-	round_s <= to_integer(unsigned(count_s));
 	resetb_s <= not reset_i;
-	key_s <= keyexp_s(round_s);
-	data_o <= data_is when en_out_s = '1' else (others => '0');
+	key_s <= keyexp_s(to_integer(unsigned(count_s)));
+	data_o <= reg_data_s when en_out_s = '1' else (others => '0');
+	data_s <= data_i when data_src_s = '1' else round_data_s;
 
-	data_register : process( clock_i, reset_i )
-	begin
-		if reset_i = '1' then
-			data_is <= data_i;
-		elsif rising_edge(clock_i) then
-			if start_i = '1' then
-				data_is <= data_i;
-			elsif we_data_s = '1' then
-				data_is <= data_os;
-			end if;
-		end if;
-	end process ; -- data_register
+	reg : reg128
+	port map(
+		data_i => data_s,
+		resetb_i => resetb_s,
+		clock_i => clock_i,
+		we_i => we_data_s,
+		data_o => reg_data_s
+	);
 
 	keyexp : KeyExpansion
 	port map(
 		key_i => key_i,
 		clock_i => clock_i,
 		count_i => count_s,
-	   	resetb_i => resetb_keyexp_s,
+	   	resetb_i => resetb_s,
 	   	start_i => start_keyexp_s,
 	   	end_o => end_keyexp_s,
 	   	key_o => keyexp_s
@@ -125,36 +125,34 @@ begin
 		resetb_i => resetb_s,
 		clock_i => clock_i,
 		start_i => start_i,
-		end_keyexp_i => end_keyexp_s,
 		count_i => count_s,
-		resetb_keyexp_o => resetb_keyexp_s,
-		resetb_count_o => resetb_count_s,
+		end_keyexp_i => end_keyexp_s,
 		start_keyexp_o => start_keyexp_s,
 		en_mixcolumns_o => en_mixcolumns_s,
 		en_round_o => en_round_s,
 		en_out_o => en_out_s,
 		en_count_o => en_count_s,
 		we_data_o => we_data_s,
-		done_o => done_o,
-		init_count_o => init_count_s
+		data_src_o => data_src_s,
+		done_o => done_o
 		);
 
 	round : AESRound
 	port map(
-		data_i => data_is,
+		data_i => reg_data_s,
 		key_i => key_s,
 		en_mixcolumns_i => en_mixcolumns_s,
 		en_round_i => en_round_s,
 		inv_i => inv_i,
-		data_o => data_os
+		data_o => round_data_s
 		);
 
 	count : counter11
 	port map(
 		clock_i => clock_i,
-		resetb_i => resetb_count_s,
+		resetb_i => resetb_s,
 		en_i => en_count_s,
-		count_i => init_count_s,
+		count_i => x"0",
 		count_o => count_s
 		);
 

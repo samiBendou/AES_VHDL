@@ -26,6 +26,7 @@ architecture AES_arch of AES is
 		clock_i : in std_logic;
 		resetb_i : in std_logic;
 		start_i : in std_logic;
+		count_i : in bit4;
 		end_o : out std_logic;
 		key_o : out type_expanded_key
 		);
@@ -36,14 +37,17 @@ architecture AES_arch of AES is
 		clock_i : in  std_logic;
 		start_i : in  std_logic;
 		end_keyexp_i : in std_logic;
-		round_o : out bit4;
+		count_i : in bit4;
 		resetb_keyexp_o : out std_logic;
+		resetb_count_o : out std_logic;
 		start_keyexp_o : out std_logic;
 		en_mixcolumns_o : out std_logic;
 		en_round_o : out std_logic;
-		we_data_o : out std_logic;
 		en_out_o : out std_logic;
-		done_o : out std_logic
+		en_count_o : out std_logic;
+		we_data_o : out std_logic;
+		done_o : out std_logic;
+		init_count_o : out bit4
 		);
 	end component;
 	component AESRound
@@ -56,27 +60,41 @@ architecture AES_arch of AES is
 		data_o : out bit128
 		);
 	end component;
+	component counter11
+	port(
+		clock_i : in std_logic;
+		resetb_i : in std_logic;
+		en_i : in std_logic;
+		count_i : in bit4;
+		count_o : out bit4
+	);
+	end component;
 
 	signal resetb_s : std_logic;
+	signal resetb_count_s : std_logic;
+	signal resetb_keyexp_s : std_logic;
+
 	signal en_mixcolumns_s : std_logic;
 	signal en_round_s : std_logic;
+	signal en_count_s : std_logic;
+	signal en_out_s : std_logic;
 	signal we_data_s : std_logic;
-	signal round_s : bit4;
-
+	
 	signal start_keyexp_s : std_logic;
-	signal resetb_keyexp_s : std_logic;
 	signal end_keyexp_s : std_logic;
+	signal init_count_s : bit4;
 
+	signal count_s : bit4;
 	signal data_is, data_os : bit128;
 	signal key_s : bit128;
 	signal keyexp_s : type_expanded_key;
-
-	signal en_s : std_logic;
-
+	signal round_s : integer range 0 to 10;
+	
 begin
+	round_s <= to_integer(unsigned(count_s));
 	resetb_s <= not reset_i;
-	key_s <= keyexp_s(to_integer(unsigned(round_s)));
-	data_o <= data_is when en_s = '1' else (others => '0');
+	key_s <= keyexp_s(round_s);
+	data_o <= data_is when en_out_s = '1' else (others => '0');
 
 	data_register : process( clock_i, reset_i )
 	begin
@@ -94,7 +112,8 @@ begin
 	keyexp : KeyExpansion
 	port map(
 		key_i => key_i,
-	   	clock_i => clock_i,
+		clock_i => clock_i,
+		count_i => count_s,
 	   	resetb_i => resetb_keyexp_s,
 	   	start_i => start_keyexp_s,
 	   	end_o => end_keyexp_s,
@@ -107,14 +126,17 @@ begin
 		clock_i => clock_i,
 		start_i => start_i,
 		end_keyexp_i => end_keyexp_s,
-		round_o => round_s,
+		count_i => count_s,
 		resetb_keyexp_o => resetb_keyexp_s,
+		resetb_count_o => resetb_count_s,
 		start_keyexp_o => start_keyexp_s,
 		en_mixcolumns_o => en_mixcolumns_s,
 		en_round_o => en_round_s,
-        en_out_o => en_s,
+		en_out_o => en_out_s,
+		en_count_o => en_count_s,
+		we_data_o => we_data_s,
 		done_o => done_o,
-		we_data_o => we_data_s
+		init_count_o => init_count_s
 		);
 
 	round : AESRound
@@ -125,6 +147,15 @@ begin
 		en_round_i => en_round_s,
 		inv_i => inv_i,
 		data_o => data_os
+		);
+
+	count : counter11
+	port map(
+		clock_i => clock_i,
+		resetb_i => resetb_count_s,
+		en_i => en_count_s,
+		count_i => init_count_s,
+		count_o => count_s
 		);
 
 end architecture AES_arch;

@@ -18,6 +18,7 @@ entity KeyExpansion is
 		clock_i : in std_logic;
 		resetb_i : in std_logic;
 		start_i : in std_logic;
+		count_i : in bit4;
 		end_o : out std_logic;
 		key_o : out type_expanded_key
 		);
@@ -25,23 +26,14 @@ end entity KeyExpansion;
 
 architecture KeyExpansion_arch of KeyExpansion is
 
-	component Counter
-	port (
-		clock_i : in std_logic;
-		resetb_i : in std_logic;
-		en_i : in std_logic;
-		count_i : in bit4;
-		count_o : out bit4
-		);
-	end component;
 	component KeyExpansion_FSM
 	port (
 		clock_i : in std_logic;
 		resetb_i : in std_logic;
 		start_i : in std_logic;
+		count_i : in bit4;
 		end_o : out std_logic;
-		we_key_o : out std_logic;
-		count_o : out bit4
+		we_key_o : out std_logic
 		);
 	end component;
 	component KeyExpander
@@ -63,7 +55,6 @@ architecture KeyExpansion_arch of KeyExpansion is
 
 	signal en_s : std_logic;
 	signal we_key_s : std_logic;
-	signal count_s : bit4;
 
 	signal rcon_s : bit8;
 	signal expander_is, expander_os : bit128;
@@ -71,22 +62,22 @@ architecture KeyExpansion_arch of KeyExpansion is
 	signal we_s : bit11;
 
 begin
-	rcon_s <= Rcon(to_integer(unsigned(count_s)));
-	expander_is <= key_s(to_integer(unsigned(count_s)));
+	rcon_s <= Rcon(to_integer(unsigned(count_i)));
+	expander_is <= key_s(to_integer(unsigned(count_i)));
 	key_o <= key_s;
 
-	we_s(0) <= '1' and we_key_s when count_s = x"0" else '0';
+	we_s(0) <= '1' and we_key_s when count_i = x"0" else '0';
 	we_seq : for k in 1 to 10 generate
-		we_s(k) <= '1' and we_key_s when count_s = std_logic_vector(to_unsigned(k - 1, 4)) else '0';	
-	end generate ; -- we_seq
+		we_s(k) <= '1' and we_key_s when count_i = std_logic_vector(to_unsigned(k - 1, 4)) else '0';	
+    end generate ; -- we_seq
 
 	fsm: KeyExpansion_FSM port map (
 		clock_i => clock_i,
 		resetb_i => resetb_i,
 		start_i => start_i,
+		count_i => count_i,
 		end_o => end_o,
-		we_key_o => we_key_s,
-		count_o => count_s
+		we_key_o => we_key_s
 		);
 
 	expander: KeyExpander 
@@ -95,7 +86,7 @@ begin
 		rcon_i => rcon_s,
 		key_o => expander_os
 		);
-
+		
 	key_register : for k in 0 to 10 generate
 		key_register0: if k = 0 generate
 			reg0: reg128

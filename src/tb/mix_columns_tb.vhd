@@ -11,6 +11,7 @@ use ieee.STD_LOGIC_UNSIGNED.ALL;
 
 library lib_thirdparty;
 use lib_thirdparty.crypt_pack.all;
+use lib_thirdparty.test_pack.all;
 
 library lib_round;
 use lib_round.all;

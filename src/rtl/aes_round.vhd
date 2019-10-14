@@ -53,48 +53,44 @@ architecture aes_round_arch of aes_round is
 		);
 	end component;
 
-	signal data_s, sub_bytes_s, shift_rows_s, mix_columns_s, roundkey_s : state_t;
+	signal data_s, subbytes_s, shiftrows_s, mixcolumns_s, addroundkey_s : state_t;
 	signal key_s : state_t;
 
 begin
-	row_conv : for i in 0 to 3 generate
-		col_conv : for j in 0 to 3 generate
-			data_s(i)(j) <= data_i(127-32*j-8*i downto 120-32*j-8*i);
-			data_o(127-32*j-8*i downto 120-32*j-8*i) <= roundkey_s(i)(j);
-			key_s(i)(j) <= key_i(127-32*j-8*i downto 120-32*j-8*i);
-		end generate;
-	end generate;
+	key_s <= bit128_to_state(key_i);
+	data_s <= bit128_to_state(data_i);
+	data_o <= state_to_bit128(addroundkey_s);
 
 	subbytes : sub_bytes
 	port map(
 		data_i => data_s,
 		en_i => en_round_i,
 		inv_i => inv_i,
-		data_o => sub_bytes_s
+		data_o => subbytes_s
 		);
 
 	shiftrows : shift_rows
 	port map(
-		data_i => sub_bytes_s,
+		data_i => subbytes_s,
 		en_i => en_round_i,
 		inv_i => inv_i,
-		data_o => shift_rows_s
+		data_o => shiftrows_s
 		);
 
 	mixcolumns : mix_columns
 	port map(
-		data_i => shift_rows_s,
+		data_i => shiftrows_s,
 		en_i => en_mixcolumns_i,
 		inv_i => inv_i,
-		data_o => mix_columns_s
+		data_o => mixcolumns_s
 		);
 
 	addroundkey : add_roundkey
 	port map(
-		data_i => mix_columns_s,
+		data_i => mixcolumns_s,
 		key_i => key_s,
 		en_i => '1',
-		data_o => roundkey_s
+		data_o => addroundkey_s
 		);
 
 end architecture aes_round_arch;

@@ -1,52 +1,46 @@
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.std_logic_arith.all;
-use IEEE.std_logic_unsigned.all;
-use IEEE.numeric_std.all;
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.std_logic_arith.all;
+use ieee.std_logic_unsigned.all;
+use ieee.numeric_std.all;
 
 library lib_thirdparty;
 use lib_thirdparty.crypt_pack.all;
 
-entity FSM_AES is
+entity aes_fsm is
 port ( 
 	resetb_i : in  std_logic;
 	clock_i : in  std_logic;
 	start_i : in  std_logic;
+	count_i : in bit4;
 	end_keyexp_i : in std_logic;
-	round_o : out bit4;
-	resetb_keyexp_o : out std_logic;
 	start_keyexp_o : out std_logic;
 	en_mixcolumns_o : out std_logic;
 	en_round_o : out std_logic;
-	we_data_o : out std_logic;
 	en_out_o : out std_logic;
+	en_count_o : out std_logic;
+	we_data_o : out std_logic;
+	data_src_o : out std_logic;
 	done_o : out std_logic
 	);
-end FSM_AES;
+end aes_fsm;
 
-architecture FSM_AES_arch  of FSM_AES is
+architecture aes_fsm_arch  of aes_fsm is
 
-	type state_type is (reset, hold, init, start_keyexpand, wait_keyexpand, round0, roundn, lastround, done);
-	signal current_state, next_state : state_type;
-	signal count_s : integer range 0 to 10;
-	signal round_s : bit4;
+	type aes_state_t is (reset, hold, init, start_keyexp, load_keyexp, round0, roundn, lastround, done);
+	signal current_state, next_state : aes_state_t;
 
 begin
-	state_register : process(clock_i, resetb_i, count_s)
+	state_register : process( clock_i, resetb_i )
 	begin
-		if resetb_i = '0' then
+		if resetb_i =	 '0' then
 			current_state <= reset;
 		elsif rising_edge(clock_i) then
 			current_state <= next_state;
-			if current_state = round0 then
-				count_s <= 1;
-			elsif current_state = roundn then
-				count_s <= count_s + 1;
-			end if;
 		end if;
 	end process state_register;
 
-	state_comb : process( current_state, count_s, start_i, end_keyexp_i )
+	state_comb : process( current_state, count_i, start_i, end_keyexp_i )
 	begin
 		case current_state is
 			when reset =>
@@ -61,20 +55,16 @@ begin
 					if (end_keyexp_i = '1') then
 						next_state <= round0;
 					else
-						next_state <= start_keyexpand;
+						next_state <= start_keyexp;
 					end if;
-			when start_keyexpand =>
-					next_state <= wait_keyexpand;
-			when wait_keyexpand =>
-					if (end_keyexp_i = '1') then
-						next_state <= round0;
-					else
-						next_state <= wait_keyexpand;
-					end if;
+			when start_keyexp =>
+					next_state <= load_keyexp;
+			when load_keyexp =>
+					next_state <= round0;
 			when round0 =>
 					next_state <= roundn;
 			when roundn =>
-					if count_s = 9 then
+					if count_i = x"9" then
 						next_state <= lastround;
 					else
 						next_state <= roundn;
@@ -86,91 +76,89 @@ begin
 		end case;
 	end process state_comb;
 
-	out_comb : process( current_state, count_s )
+	out_comb : process( current_state, count_i )
 	begin
 		case current_state is
 			when reset =>
-				resetb_keyexp_o <= '0';
 				start_keyexp_o <= '0';
-				round_o <= x"0";
 				en_mixcolumns_o <= '0';
 				en_round_o <= '0';
 				en_out_o <= '0';
+				en_count_o <= '0';
 				we_data_o <= '0';
+				data_src_o <= '1';
 				done_o <= '0';
 			when hold =>
-				resetb_keyexp_o <= '1';
 				start_keyexp_o <= '0';
-				round_o <= x"0";
 				en_mixcolumns_o <= '0';
 				en_round_o <= '0';
 				en_out_o <= '1';
-				done_o <= '0';
+				en_count_o <= '0';
 				we_data_o <= '0';
+				data_src_o <= '1';
+				done_o <= '0';
 			when init =>
-				resetb_keyexp_o <= '1';
 				start_keyexp_o <= '0';
-				round_o <= x"0";
 				en_mixcolumns_o <= '0';
 				en_round_o <= '0';
 				en_out_o <= '0';
-				done_o <= '0';
-				we_data_o <= '0';
-			when start_keyexpand =>
-				resetb_keyexp_o <= '1';
-				start_keyexp_o <= '1';
-				round_o <= x"0";
-				en_mixcolumns_o <= '0';
-				en_round_o <= '0';
-				en_out_o <= '0';
-				done_o <= '0';
-				we_data_o <= '0';
-			when wait_keyexpand =>
-				resetb_keyexp_o <= '1';
-				start_keyexp_o <= '0';
-				round_o <= x"0";
-				en_mixcolumns_o <= '0';
-				en_round_o <= '0';
-				en_out_o <= '0';
-				done_o <= '0';
-				we_data_o <= '0';
-			when round0 =>
-				resetb_keyexp_o <= '1';
-				start_keyexp_o <= '0';
-				round_o <= x"0";
-				en_mixcolumns_o <= '0';
-				en_round_o <= '0';
-				en_out_o <= '0';
-				done_o <= '0';
+				en_count_o <= '0';
 				we_data_o <= '1';
-			when roundn =>
-				resetb_keyexp_o <= '1';
+				data_src_o <= '1';
+				done_o <= '0';
+			when start_keyexp => 
+				start_keyexp_o <= '1';
+				en_mixcolumns_o <= '0';
+				en_out_o <= '0';
+				en_count_o <= '0';
+				we_data_o <= '1';
+				data_src_o <= '1';
+				done_o <= '0';
+			when load_keyexp =>
 				start_keyexp_o <= '0';
-				round_o <= std_logic_vector(to_unsigned(count_s, 4));
+				en_mixcolumns_o <= '0';
+				en_out_o <= '0';
+				en_count_o <= '0';
+				we_data_o <= '0';
+				data_src_o <= '0';
+				done_o <= '0';
+			when round0 =>
+				start_keyexp_o <= '0';
+				en_mixcolumns_o <= '0';
+				en_round_o <= '0';
+				en_out_o <= '0';
+				en_count_o <= '1';
+				we_data_o <= '1';
+				data_src_o <= '0';
+				done_o <= '0';
+			when roundn =>
+				start_keyexp_o <= '0';
 				en_mixcolumns_o <= '1';
 				en_round_o <= '1';
 				en_out_o <= '0';
-				done_o <= '0';
+				en_count_o <= '1';
 				we_data_o <= '1';
+				data_src_o <= '0';
+				done_o <= '0';
 			when lastround =>
-				resetb_keyexp_o <= '1';
 				start_keyexp_o <= '0';
-				round_o <= std_logic_vector(to_unsigned(count_s, 4));
 				en_mixcolumns_o <= '0';
 				en_round_o <= '1';
 				en_out_o <= '0';
-				done_o <= '0';
+				en_count_o <= '1';
 				we_data_o <= '1';
+				data_src_o <= '0';
+				done_o <= '0';
 			when done =>
-				resetb_keyexp_o <= '1';
 				start_keyexp_o <= '0';
-				round_o <= x"0";
 				en_mixcolumns_o <= '0';
 				en_round_o <= '1';
 				en_out_o <= '1';
-				done_o <= '1';
+				en_count_o <= '0';
 				we_data_o <= '0';
+				data_src_o <= '0';
+				done_o <= '1';
 		end case;
 	end process out_comb;
 
-end FSM_AES_arch;
+end aes_fsm_arch;

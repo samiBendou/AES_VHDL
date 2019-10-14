@@ -1,11 +1,11 @@
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 library lib_thirdparty;
 use lib_thirdparty.crypt_pack.all;
 
-entity reg128 is
+entity state_reg is
 	port (
 		data_i : in bit128;
 		resetb_i : in std_logic;
@@ -13,9 +13,9 @@ entity reg128 is
 		we_i : in std_logic;
 		data_o : out bit128
 	) ;
-end reg128;
+end state_reg;
 
-architecture reg128_arch of reg128 is
+architecture state_reg_arch of state_reg is
 
 	signal data_s : bit128;
 
@@ -35,4 +35,4 @@ begin
 		end if;
 	end process ; -- register
 
-end reg128_arch ; -- reg128_arch
+end state_reg_arch ; -- state_reg_arch

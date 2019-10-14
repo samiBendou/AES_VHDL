@@ -1,7 +1,7 @@
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
-use IEEE.STD_LOGIC_UNSIGNED.ALL;
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use ieee.STD_LOGIC_UNSIGNED.ALL;
 
 library lib_thirdparty;
 use lib_thirdparty.crypt_pack.all;
@@ -10,24 +10,24 @@ library lib_rtl;
 use lib_rtl.all;
 
 
-entity AESRound_tb is
-end AESRound_tb;
+entity aes_round_tb is
+end aes_round_tb;
 
-architecture AESRound_tb_arch of AESRound_tb is
+architecture aes_round_tb_arch of aes_round_tb is
 
-    component AESRound
+    component aes_round
     port(
         data_i : in bit128;
         key_i : in bit128;
-        en_mixcolumns_i : in std_logic;
+        en_mix_columns_i : in std_logic;
         en_round_i : in std_logic;
         inv_i : in std_logic;
         data_o : out bit128
         );
     end component;
 
-    signal data_is, data_os, currentkey_s : type_state;
-    signal en_s, en_mixcolumns_s, resetb_s : std_logic;
+    signal data_is, data_os, currentkey_s : state_t;
+    signal en_s, en_mix_columns_s, resetb_s : std_logic;
     signal cond_s : boolean;
     signal clock_s : std_logic;
 
@@ -47,4 +47,4 @@ begin
 
     assert cond_s report "output differs from expected output" severity error;
 
-end AESRound_tb_arch ; -- AESRound_tb_arch
+end aes_round_tb_arch ; -- aes_round_tb_arch

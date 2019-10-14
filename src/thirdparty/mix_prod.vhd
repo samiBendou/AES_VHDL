@@ -1,29 +1,29 @@
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 library lib_thirdparty;
 use lib_thirdparty.crypt_pack.all;
 
-entity MatrixMultiplier is
+entity mix_prod is
 port(   
-	data_i : in column_state;
+	data_i : in col_state_t;
 	inv_i : in std_logic;
-	data_o : out column_state
+	data_o : out col_state_t
 	);
-end MatrixMultiplier;
+end mix_prod;
 
-architecture MatrixMultiplier_arch of MatrixMultiplier is
-signal data2_s : column_state;
-signal data4_s : column_state;
-signal data8_s : column_state;
-signal data3_s : column_state;
-signal data9_s : column_state;
-signal datab_s : column_state;
-signal datad_s : column_state;
-signal datae_s : column_state;
+architecture mix_prod_arch of mix_prod is
+signal data2_s : col_state_t;
+signal data4_s : col_state_t;
+signal data8_s : col_state_t;
+signal data3_s : col_state_t;
+signal data9_s : col_state_t;
+signal datab_s : col_state_t;
+signal datad_s : col_state_t;
+signal datae_s : col_state_t;
 
-signal data_s, data_inv_s : column_state;
+signal data_s, data_inv_s : col_state_t;
 
 begin
 	data_o <= data_s when inv_i = '0' else data_inv_s;
@@ -52,5 +52,5 @@ begin
 	data_inv_s(2) <= datad_s(0) xor data9_s(1) xor datae_s(2) xor datab_s(3);
 	data_inv_s(3) <= datab_s(0) xor datad_s(1) xor data9_s(2) xor datae_s(3);
 	
-end architecture MatrixMultiplier_arch;
+end architecture mix_prod_arch;
 

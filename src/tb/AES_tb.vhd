@@ -5,6 +5,7 @@ use ieee.std_logic_unsigned.ALL;
 
 library lib_thirdparty;
 use lib_thirdparty.crypt_pack.all;
+use lib_thirdparty.test_pack.all;
 
 library lib_rtl;
 use lib_rtl.all;
@@ -35,11 +36,12 @@ architecture aes_tb_arch of aes_tb is
 	signal text_s : bit128;
 	signal key_s : bit128;
 	signal cipher_s : bit128;
+	signal cipher_es : bit128;
+
+	signal cond_s : boolean;
 	
 begin
-	text_s <= X"3243f6a8885a308d313198a2e0370734";
-	key_s <= X"2b7e151628aed2a6abf7158809cf4f3c";
-	reset_s <= '1', '0' after 100 ns;
+
 	clock_s <= not clock_s after 50 ns;
 
 	DUT : aes
@@ -56,15 +58,28 @@ begin
 
 	PUT : process
 	begin
+		text_s <= state_to_bit128(std_input_c);
+		key_s <= state_to_bit128(std_roundkey_c(0));
+		cipher_es <= (others => '0');
+		
+		reset_s <= '1';
 		start_s <= '0';
+		wait for 100 ns;
+		reset_s <= '0';
 		wait for 200 ns;
 		start_s <= '1';
 		wait for 200 ns;
 		start_s <= '0';
-		wait for 3000 ns;
-		start_s <= '1';
-		wait for 120 ns;
+		wait for 1300 ns;
+		
+		cipher_es <= state_to_bit128(std_output_c);
+		
+		wait for 300 ns;
+
 	end process PUT;
+
+	cond_s <= cipher_s = cipher_es;
+	assert cond_s report "output differs from expected output" severity error;
 
 end architecture aes_tb_arch;
 

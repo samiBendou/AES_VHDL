@@ -25,7 +25,7 @@ architecture add_roundkey_arch of add_roundkey is
 begin
     data_o <= data_s when en_i = '1' else data_i;
         
-    raw : for i in 0 to 3 generate
+    row : for i in 0 to 3 generate
         col : for j in 0 to 3 generate
             data_s(i)(j) <= data_i(i)(j) xor key_i(i)(j);
         end generate;

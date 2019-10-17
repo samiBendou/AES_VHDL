@@ -32,11 +32,10 @@ architecture aes_tb_arch of aes_tb is
 	signal reset_s : std_logic;
 	signal start_s : std_logic;
 	signal done_s : std_logic;
+	signal inv_s : std_logic := '0';
 
-	signal text_s : bit128;
 	signal key_s : bit128;
-	signal cipher_s : bit128;
-	signal cipher_es : bit128;
+	signal data_is, data_os, data_es : bit128;
 
 	signal cond_s : boolean;
 	
@@ -50,18 +49,23 @@ begin
 		reset_i => reset_s,
 		start_i => start_s,
 		key_i => key_s,
-		inv_i => '0',
-		data_i => text_s,
-		data_o => cipher_s,
+		inv_i => inv_s,
+		data_i => data_is,
+		data_o => data_os,
 		done_o => done_s
 		);
 
 	PUT : process
 	begin
-		text_s <= state_to_bit128(std_input_c);
-		key_s <= state_to_bit128(std_roundkey_c(0));
-		cipher_es <= (others => '0');
-		
+		key_s <= std_input_key_c;
+		data_es <= (others => '0');
+
+		if inv_s = '0' then
+			data_is <= std_input_c;
+		else
+			data_is <= std_output_c;
+		end if;
+
 		reset_s <= '1';
 		start_s <= '0';
 		wait for 100 ns;
@@ -71,14 +75,23 @@ begin
 		wait for 200 ns;
 		start_s <= '0';
 		wait for 1300 ns;
-		
-		cipher_es <= state_to_bit128(std_output_c);
-		
-		wait for 300 ns;
+
+		if inv_s = '0' then
+			data_es <= std_output_c;
+		else
+			wait for 1200 ns;
+			data_es <= std_input_c;
+		end if;
+
+		wait for 1000 ns;
+
+		inv_s <= not inv_s;
+
+		wait for 100 ns;
 
 	end process PUT;
 
-	cond_s <= cipher_s = cipher_es;
+	cond_s <= data_os = data_es;
 	assert cond_s report "output differs from expected output" severity error;
 
 end architecture aes_tb_arch;

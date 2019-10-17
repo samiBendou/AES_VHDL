@@ -30,6 +30,7 @@ architecture aes_round_tb_arch of aes_round_tb is
     signal data_is, data_os, data_es, key_s : bit128;
     signal en_round_s, en_mixcolumns_s : std_logic;
     signal cond_s : boolean;
+    signal inv_s : std_logic := '0';
 begin
 
     DUT : aes_round
@@ -38,17 +39,15 @@ begin
         key_i => key_s,
         en_mixcolumns_i => en_mixcolumns_s,
         en_round_i => en_round_s,
-        inv_i => '0',
+        inv_i => inv_s,
         data_o => data_os
     );
     PUT : process
+    variable k_inv_v : integer range 0 to 10;
+    variable data_iv, data_ev, data_inv_iv, data_inv_ev : bit128;
     begin
         round : for k in 0 to 10 loop
-            if k = 0 then
-                data_is <= state_to_bit128(std_input_c);
-            else
-                data_is <= state_to_bit128(std_round_data_c(k - 1));
-            end if;
+            k_inv_v := 10 - k;
 
             if k = 0 then 
                 en_round_s <= '0';
@@ -60,11 +59,21 @@ begin
                 en_mixcolumns_s <= '1';
             end if;
 
-            key_s <= state_to_bit128(std_roundkey_c(k));
-            data_es <= state_to_bit128(std_round_data_c(k));
+            if inv_s = '0' then
+                data_is <= std_rounddata_c(k);
+                key_s <= std_roundkey_c(k);
+                data_es <= std_rounddata_c(k + 1);
+            else
+                data_is <= std_rounddata_inv_c(k);
+                key_s <= std_roundkey_inv_c(k);
+                data_es <= std_rounddata_inv_c(k + 1);
+            end if;
             assert cond_s report "output differs from expected output" severity error;
             wait for 100 ns;
         end loop; -- round
+
+        wait for 300 ns;
+        inv_s <= not inv_s;
     end process PUT;
 
     cond_s <= data_es = data_os;

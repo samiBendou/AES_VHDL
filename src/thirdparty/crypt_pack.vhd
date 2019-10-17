@@ -16,16 +16,22 @@ package crypt_pack is
 	type state_t is array(0 to 3) of row_state_t;
 	type word_t is array(0 to 3) of col_state_t;
 	type keyexp_t is array(0 to 10) of bit128;
+	type keyexp_state_t is array(0 to 10) of state_t;
 	type rcon_t is array(0 to 10) of bit8;
-	type test_data_t is array(0 to 10) of state_t;
+	
 
 	function state_to_bit128(data_i : state_t) return bit128;
 
+	function state_to_word(data_i : state_t) return word_t;
+
 	function word_to_bit128(data_i : word_t) return bit128;
+
+	function word_to_state(data_i : word_t) return state_t;
 
 	function bit128_to_state(data_i : bit128) return state_t;
 	
 	function bit128_to_word(data_i : bit128) return word_t;
+	
 
 	function "xor" ( L,R: col_state_t ) return col_state_t;
 
@@ -109,12 +115,36 @@ package body crypt_pack is
 		return data_v;
 	end function;
 
+	function state_to_word(data_i : state_t) return word_t is 
+	variable data_v : word_t;
+	begin
+		for i in 0 to 3 loop 
+			for j in 0 to 3 loop
+				data_v(i)(j) := data_i(j)(i);
+			end loop;
+		end loop;
+		
+		return data_v;
+	end function;
+
 	function word_to_bit128(data_i : word_t) return bit128 is 
 	variable data_v : bit128;
 	begin
 		for i in 0 to 3 loop 
 			for j in 0 to 3 loop
 				data_v(127-32*i-8*j downto 120-32*i-8*j) := data_i(i)(j);
+			end loop;
+		end loop;
+		
+		return data_v;
+	end function;
+
+	function word_to_state(data_i : word_t) return state_t is 
+	variable data_v : state_t;
+	begin
+		for i in 0 to 3 loop 
+			for j in 0 to 3 loop
+				data_v(i)(j) := data_i(j)(i);
 			end loop;
 		end loop;
 		

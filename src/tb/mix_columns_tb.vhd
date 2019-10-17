@@ -34,6 +34,7 @@ architecture mix_columns_tb_arch of mix_columns_tb is
     signal data_os : state_t;
     signal data_es : state_t;
     signal en_s : std_logic;
+    signal inv_s : std_logic := '0';
     signal cond_s : boolean;
 
 begin
@@ -42,7 +43,7 @@ begin
         data_i => data_is,
         data_o => data_os,
         en_i => en_s,
-        inv_i => '0'
+        inv_i => inv_s
         );
 
     PUT : process
@@ -53,11 +54,18 @@ begin
             else   
                 en_s <= '1';
             end if;
-            data_is <= std_shift_rows_data_c(k);
-            data_es <= std_mix_columns_data_c(k);
+
+            if inv_s = '1' then
+                data_is <= std_mix_columns_data_c(k);
+                data_es <= std_shift_rows_data_c(k);
+            else
+                data_is <= std_shift_rows_data_c(k);
+                data_es <= std_mix_columns_data_c(k);
+            end if;
             assert cond_s report "output differs from expected output" severity error;
             wait for 100 ns;
         end loop; -- round
+        inv_s <= not inv_s;
     end process PUT;
     
     cond_s <= data_os = data_es;

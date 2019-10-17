@@ -10,6 +10,7 @@ entity round_counter is
     clock_i : in std_logic;
     resetb_i : in std_logic;
     en_i : in std_logic;
+    up_i : in std_logic;
     count_i : in bit4;
     count_o : out bit4
   );
@@ -28,10 +29,22 @@ begin
     if (resetb_i = '0') then
       count_s <= 0;
     elsif rising_edge(clock_i) then
-      if en_i = '0' or count_s = to_integer(unsigned(count_i)) + 10 then
+      if en_i = '0' then
         count_s <= to_integer(unsigned(count_i));
       elsif en_i = '1' then
-        count_s <= count_s + 1;
+        if up_i = '1' then
+          if count_s = to_integer(unsigned(count_i)) + 10 then
+            count_s <= to_integer(unsigned(count_i));
+          else
+            count_s <= count_s + 1;
+          end if;
+        else
+          if count_s = 0 then
+            count_s <= to_integer(unsigned(count_i));
+          else
+            count_s <= count_s - 1;
+          end if;
+        end if;
       end if;
     end if;
   end process ; -- count

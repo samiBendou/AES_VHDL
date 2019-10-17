@@ -36,6 +36,7 @@ architecture key_expansion_arch of key_expansion is
 		resetb_i : in std_logic;
 		start_i : in std_logic;
 		inv_i : in std_logic;
+		key_changed_i : std_logic;
 		count_i : in bit4;
 		end_o : out std_logic;
 		we_key_o : out std_logic
@@ -72,6 +73,7 @@ architecture key_expansion_arch of key_expansion is
 	signal en_s : std_logic;
 	signal en_mix_s : std_logic;
 	signal we_key_s : std_logic;
+	signal key_changed_s : std_logic;
 
 	signal rcon_s : bit8;
 	signal expander_is, expander_os : bit128;
@@ -80,6 +82,7 @@ architecture key_expansion_arch of key_expansion is
 	signal we_s : bit11;
 
 begin
+	key_changed_s <= '0' when key_i = key_s(0) else '1';
 	key_mix_s(0) <= bit128_to_state(key_s(0));
 	key_mix_s(10) <= bit128_to_state(key_s(10));
 	rcon_s <= rcon_c(to_integer(unsigned(count_i)));
@@ -92,6 +95,7 @@ begin
 		resetb_i => resetb_i,
 		start_i => start_i,
 		inv_i => inv_i,
+		key_changed_i => key_changed_s,
 		count_i => count_i,
 		end_o => end_o,
 		we_key_o => we_key_s
@@ -107,9 +111,7 @@ begin
 		);
 		
 	key_register : for k in 0 to 10 generate
-
 		key_o(k) <= state_to_bit128(key_mix_s(k));
-
 		key_register0: if k = 0 generate
 			we_s(0) <= '1' and we_key_s when count_i = x"0" else '0';
 			reg0: state_reg

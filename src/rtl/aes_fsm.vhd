@@ -121,7 +121,7 @@ begin
 				en_round_o <= '0';
 				en_out_o <= '0';
 				en_count_o <= '0';
-				up_count_o <= '1';
+				up_count_o <= invb_s;
 				we_data_o <= '1';
 				data_src_o <= '1';
 				done_o <= '0';

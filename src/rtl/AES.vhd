@@ -29,7 +29,7 @@ architecture aes_arch of aes is
 		count_i : in bit4;
 		inv_i : in std_logic;
 		end_o : out std_logic;
-		key_o : out keyexp_t
+		key_o : out bit128
 		);
 	end component;
 	component aes_fsm
@@ -97,12 +97,10 @@ architecture aes_arch of aes is
 	signal count_s, init_count_s : bit4;
 	signal data_s, round_data_s, reg_data_s : bit128;
 	signal key_s : bit128;
-	signal keyexp_s : keyexp_t;
 	
 begin
 	resetb_s <= not reset_i;
 	init_count_s <= x"0" when up_count_s = '1' else x"a";
-	key_s <= keyexp_s(to_integer(unsigned(count_s)));
 	data_o <= reg_data_s when en_out_s = '1' else (others => '0');
 	data_s <= data_i when data_src_s = '1' else round_data_s;
 
@@ -124,7 +122,7 @@ begin
 		start_i => start_keyexp_s,
 		inv_i => inv_i,
 	   	end_o => end_keyexp_s,
-	   	key_o => keyexp_s
+	   	key_o => key_s
        	);
 
 	fsm : aes_fsm

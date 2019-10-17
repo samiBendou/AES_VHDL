@@ -20,7 +20,6 @@ port (
 	key_i : in bit128;
 	rcon_i : in bit8;
 	inv_i : in std_logic;
-	en_mix_i : in std_logic;
 	key_o : out bit128
 	);
 end entity key_expander;

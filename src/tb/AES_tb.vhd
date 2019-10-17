@@ -27,7 +27,8 @@ architecture aes_tb_arch of aes_tb is
 		done_o : out std_logic
 		);
 	end component;
-		
+	
+	signal count_test_s : integer := 1;
 	signal clock_s : std_logic := '1';
 	signal reset_s : std_logic;
 	signal start_s : std_logic;
@@ -58,7 +59,6 @@ begin
 	PUT : process
 	begin
 		key_s <= std_input_key_c;
-		data_es <= (others => '0');
 
 		if inv_s = '0' then
 			data_is <= std_input_c;
@@ -66,13 +66,21 @@ begin
 			data_is <= std_output_c;
 		end if;
 
-		reset_s <= '1';
-		start_s <= '0';
+		if count_test_s rem 4 < 2 then
+			reset_s <= '1';
+			data_es <= (others => '0');
+		else
+			reset_s <= '0';
+		end if;
+		 
+		start_s <= '0';	
 		wait for 100 ns;
 		reset_s <= '0';
 		wait for 200 ns;
 		start_s <= '1';
-		wait for 200 ns;
+		wait for 100 ns;
+		data_es <= (others => '0');
+		wait for 100 ns;
 		start_s <= '0';
 		wait for 1300 ns;
 
@@ -83,11 +91,11 @@ begin
 			data_es <= std_input_c;
 		end if;
 
-		wait for 1000 ns;
-
 		inv_s <= not inv_s;
 
 		wait for 100 ns;
+
+		count_test_s <= count_test_s + 1;
 
 	end process PUT;
 

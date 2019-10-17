@@ -4,12 +4,19 @@ add wave -noupdate /aes_tb/clock_s
 add wave -noupdate /aes_tb/reset_s
 add wave -noupdate /aes_tb/start_s
 add wave -noupdate /aes_tb/done_s
-add wave -noupdate /aes_tb/text_s
+add wave -noupdate /aes_tb/inv_s
 add wave -noupdate /aes_tb/key_s
-add wave -noupdate /aes_tb/cipher_s
-add wave -noupdate /aes_tb/DUT/round_s
-add wave -noupdate /aes_tb/DUT/fsm/counter_s
+add wave -noupdate /aes_tb/DUT/key_s
+add wave -noupdate /aes_tb/data_is
+add wave -noupdate /aes_tb/data_os
+add wave -noupdate /aes_tb/data_es
+add wave -noupdate /aes_tb/DUT/round_data_s
+add wave -noupdate /aes_tb/DUT/reg_data_s
+add wave -noupdate /aes_tb/DUT/keyexp_s
+add wave -noupdate /aes_tb/DUT/keyexp/fsm/current_state
 add wave -noupdate /aes_tb/DUT/fsm/current_state
+add wave -noupdate /aes_tb/DUT/count_s
+add wave -noupdate /aes_tb/cond_s
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {0 ns} 0}
 quietly wave cursor active 0
@@ -27,4 +34,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {1230 ns} {2056 ns}
+WaveRestoreZoom {0 ns} {737 ns}

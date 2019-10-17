@@ -27,8 +27,9 @@ architecture aes_arch of aes is
 		resetb_i : in std_logic;
 		start_i : in std_logic;
 		count_i : in bit4;
+		inv_i : in std_logic;
 		end_o : out std_logic;
-		key_o : out keyexp_t
+		key_o : out bit128
 		);
 	end component;
 	component aes_fsm
@@ -38,11 +39,13 @@ architecture aes_arch of aes is
 		start_i : in  std_logic;
 		count_i : in bit4;
 		end_keyexp_i : in std_logic;
+		inv_i : in std_logic;
 		start_keyexp_o : out std_logic;
 		en_mixcolumns_o : out std_logic;
 		en_round_o : out std_logic;
 		en_out_o : out std_logic;
 		en_count_o : out std_logic;
+		up_count_o : out std_logic;
 		we_data_o : out std_logic;
 		data_src_o : out std_logic;
 		done_o : out std_logic
@@ -63,6 +66,7 @@ architecture aes_arch of aes is
 		clock_i : in std_logic;
 		resetb_i : in std_logic;
 		en_i : in std_logic;
+		up_i : in std_logic;
 		count_i : in bit4;
 		count_o : out bit4
 	);
@@ -85,18 +89,18 @@ architecture aes_arch of aes is
 	signal en_out_s : std_logic;
 	signal we_data_s : std_logic;
 	signal data_src_s : std_logic;
+	signal up_count_s : std_logic;
 
 	signal start_keyexp_s : std_logic;
 	signal end_keyexp_s : std_logic;
 
-	signal count_s : bit4;
+	signal count_s, init_count_s : bit4;
 	signal data_s, round_data_s, reg_data_s : bit128;
 	signal key_s : bit128;
-	signal keyexp_s : keyexp_t;
 	
 begin
 	resetb_s <= not reset_i;
-	key_s <= keyexp_s(to_integer(unsigned(count_s)));
+	init_count_s <= x"0" when up_count_s = '1' else x"a";
 	data_o <= reg_data_s when en_out_s = '1' else (others => '0');
 	data_s <= data_i when data_src_s = '1' else round_data_s;
 
@@ -115,9 +119,10 @@ begin
 		clock_i => clock_i,
 		count_i => count_s,
 	   	resetb_i => resetb_s,
-	   	start_i => start_keyexp_s,
+		start_i => start_keyexp_s,
+		inv_i => inv_i,
 	   	end_o => end_keyexp_s,
-	   	key_o => keyexp_s
+	   	key_o => key_s
        	);
 
 	fsm : aes_fsm
@@ -127,11 +132,13 @@ begin
 		start_i => start_i,
 		count_i => count_s,
 		end_keyexp_i => end_keyexp_s,
+		inv_i => inv_i,
 		start_keyexp_o => start_keyexp_s,
 		en_mixcolumns_o => en_mixcolumns_s,
 		en_round_o => en_round_s,
 		en_out_o => en_out_s,
 		en_count_o => en_count_s,
+		up_count_o => up_count_s,
 		we_data_o => we_data_s,
 		data_src_o => data_src_s,
 		done_o => done_o
@@ -152,7 +159,8 @@ begin
 		clock_i => clock_i,
 		resetb_i => resetb_s,
 		en_i => en_count_s,
-		count_i => x"0",
+		up_i => up_count_s,
+		count_i => init_count_s,
 		count_o => count_s
 		);
 

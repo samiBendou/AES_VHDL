@@ -6,92 +6,79 @@ library lib_thirdparty;
 use lib_thirdparty.crypt_pack.all;
 
 package test_pack is
+
+	type test_data_t is array(0 to 10) of state_t;
+	type round_data_t is array(0 to 11) of bit128;
     
-	constant std_input_c : state_t :=
+	constant std_input_c : bit128 := x"00112233445566778899aabbccddeeff";
+
+	constant std_output_c : bit128 := x"69c4e0d86a7b0430d8cdb78070b4c55a";
+
+	constant std_input_key_c : bit128 := x"000102030405060708090a0b0c0d0e0f";
+
+	constant std_rounddata_c : round_data_t :=
 	(
-		(x"32", x"88", x"31", x"e0"),
-		(x"43", x"5a", x"31", x"37"),
-		(x"f6", x"30", x"98", x"07"),
-		(x"a8", x"8d", x"a2", x"34") 
+		x"00112233445566778899aabbccddeeff",
+		x"00102030405060708090a0b0c0d0e0f0",
+		x"89d810e8855ace682d1843d8cb128fe4",
+		x"4915598f55e5d7a0daca94fa1f0a63f7",
+		x"fa636a2825b339c940668a3157244d17",
+		x"247240236966b3fa6ed2753288425b6c",
+		x"c81677bc9b7ac93b25027992b0261996",
+		x"c62fe109f75eedc3cc79395d84f9cf5d",
+		x"d1876c0f79c4300ab45594add66ff41f",
+		x"fde3bad205e5d0d73547964ef1fe37f1",
+		x"bd6e7c3df2b5779e0b61216e8b10b689",
+		x"69c4e0d86a7b0430d8cdb78070b4c55a"
+		);
+
+	constant std_rounddata_inv_c : round_data_t :=
+	(
+		x"69c4e0d86a7b0430d8cdb78070b4c55a",
+		x"7ad5fda789ef4e272bca100b3d9ff59f",
+		x"54d990a16ba09ab596bbf40ea111702f",
+		x"3e1c22c0b6fcbf768da85067f6170495",
+		x"b458124c68b68a014b99f82e5f15554c",
+		x"e8dab6901477d4653ff7f5e2e747dd4f",
+		x"36339d50f9b539269f2c092dc4406d23",
+		x"2d6d7ef03f33e334093602dd5bfb12c7",
+		x"3bd92268fc74fb735767cbe0c0590e2d",
+		x"a7be1a6997ad739bd8c9ca451f618b61",
+		x"6353e08c0960e104cd70b751bacad0e7",
+		x"00112233445566778899aabbccddeeff"
 	);
 
-	constant std_output_c : state_t :=
+	constant std_roundkey_c : round_data_t :=
 	(
-		(x"39", x"02", x"dc", x"19"),
-		(x"25", x"dc", x"11", x"6a"),
-		(x"84", x"09", x"85", x"0b"),
-		(x"1d", x"fb", x"97", x"32")
+		x"000102030405060708090a0b0c0d0e0f",
+		x"d6aa74fdd2af72fadaa678f1d6ab76fe",
+		x"b692cf0b643dbdf1be9bc5006830b3fe",
+		x"b6ff744ed2c2c9bf6c590cbf0469bf41",
+		x"47f7f7bc95353e03f96c32bcfd058dfd",
+		x"3caaa3e8a99f9deb50f3af57adf622aa",
+		x"5e390f7df7a69296a7553dc10aa31f6b",
+		x"14f9701ae35fe28c440adf4d4ea9c026",
+		x"47438735a41c65b9e016baf4aebf7ad2",
+		x"549932d1f08557681093ed9cbe2c974e",
+		x"13111d7fe3944a17f307a78b4d2b30c5",
+		x"00000000000000000000000000000000"
 	);
 
-	constant std_round_data_c : test_data_t :=
-	(
-		( 
-			(x"19", x"a0", x"9a", x"e9"),
-			(x"3d", x"f4", x"c6", x"f8"),
-			(x"e3", x"e2", x"8d", x"48"),
-			(x"be", x"2b", x"2a", x"08") 
-		),
-		(
-			(x"a4", x"68", x"6b", x"02"),
-			(x"9c", x"9f", x"5b", x"6a"),
-			(x"7f", x"35", x"ea", x"50"),
-			(x"f2", x"2b", x"43", x"49")
-		),
-		(   
-			(x"aa", x"61", x"82", x"68"),
-			(x"8f", x"dd", x"d2", x"32"),
-			(x"5f", x"e3", x"4a", x"46"),
-			(x"03", x"ef", x"d2", x"9a")
-		),
-		(
-			(x"48", x"67", x"4d", x"d6"),
-			(x"6c", x"1d", x"e3", x"5f"),
-			(x"4e", x"9d", x"b1", x"58"),
-			(x"ee", x"0d", x"38", x"e7")
-		),   
-		(
-			(x"e0", x"c8", x"d9", x"85"),
-			(x"92", x"63", x"b1", x"b8"),
-			(x"7f", x"63", x"35", x"be"),
-			(x"e8", x"c0", x"50", x"01") 
-		),
-		(
 
-			(x"f1", x"c1", x"7c", x"5d"),
-			(x"00", x"92", x"c8", x"b5"),
-			(x"6f", x"4c", x"8b", x"d5"),
-			(x"55", x"ef", x"32", x"0c")
-		),
-		(
-			(x"26", x"3d", x"e8", x"fd"),
-			(x"0e", x"41", x"64", x"d2"),
-			(x"2e", x"b7", x"72", x"8b"),
-			(x"17", x"7d", x"a9", x"25")
-		),
-		(
-			(x"5a", x"19", x"a3", x"7a"),
-			(x"41", x"49", x"e0", x"8c"),
-			(x"42", x"dc", x"19", x"04"),
-			(x"b1", x"1f", x"65", x"0c")
-		),
-		(
-			(x"ea", x"04", x"65", x"85"),
-			(x"83", x"45", x"5d", x"96"),
-			(x"5c", x"33", x"98", x"b0"),
-			(x"f0", x"2d", x"ad", x"c5") 
-		),
-		(
-			(x"eb", x"59", x"8b", x"1b"),
-			(x"40", x"2e", x"a1", x"c3"),
-			(x"f2", x"38", x"13", x"42"),
-			(x"1e", x"84", x"e7", x"d2") 
-		),
-			(
-			(x"39", x"02", x"dc", x"19"),
-			(x"25", x"dc", x"11", x"6a"),
-			(x"84", x"09", x"85", x"0b"),
-			(x"1d", x"fb", x"97", x"32")
-		)
+	constant std_roundkey_inv_c : round_data_t :=
+	(
+		x"13111d7fe3944a17f307a78b4d2b30c5",
+		x"13aa29be9c8faff6f770f58000f7bf03",
+		x"1362a4638f2586486bff5a76f7874a83",
+		x"8d82fc749c47222be4dadc3e9c7810f5",
+		x"72e3098d11c5de5f789dfe1578a2cccb",
+		x"2ec410276326d7d26958204a003f32de",
+		x"a8a2f5044de2c7f50a7ef79869671294",
+		x"c7c6e391e54032f1479c306d6319e50c",
+		x"a0db02992286d160a2dc029c2485d561",
+		x"8c56dff0825dd3f9805ad3fc8659d7fd",
+		x"000102030405060708090a0b0c0d0e0f",
+		x"00000000000000000000000000000000"
 	);
 
 	constant std_shift_rows_data_c : test_data_t := 
@@ -304,74 +291,5 @@ package test_pack is
 			(x"72", x"5f", x"94", x"b5")
 		)
 	);
-
-	constant std_roundkey_c : test_data_t :=
-	(
-		(
-			(x"2b", x"28", x"ab", x"09"),
-			(x"7e", x"ae", x"f7", x"cf"),
-			(x"15", x"d2", x"15", x"4f"),
-			(x"16", x"a6", x"88", x"3c") 
-		),
-		(
-			(x"a0", x"88", x"23", x"2a"),
-			(x"fa", x"54", x"a3", x"6c"),
-			(x"fe", x"2c", x"39", x"76"),
-			(x"17", x"b1", x"39", x"05") 
-		),
-		(
-			(x"f2", x"7a", x"59", x"73"),
-			(x"c2", x"96", x"35", x"59"),
-			(x"95", x"b9", x"80", x"f6"),
-			(x"f2", x"43", x"7a", x"7f") 
-		),
-		(
-			(x"3d", x"47", x"1e", x"6d"),
-			(x"80", x"16", x"23", x"7a"),
-			(x"47", x"fe", x"7e", x"88"),
-			(x"7d", x"3e", x"44", x"3b") 
-		),
-		(
-			(x"ef", x"a8", x"b6", x"db"),
-			(x"44", x"52", x"71", x"0b"),
-			(x"a5", x"5b", x"25", x"ad"),
-			(x"41", x"7f", x"3b", x"00") 
-		),
-		(
-			(x"d4", x"7c", x"ca", x"11"),
-			(x"d1", x"83", x"f2", x"f9"),
-			(x"c6", x"9d", x"b8", x"15"),
-			(x"f8", x"87", x"bc", x"bc") 
-		),
-		(
-			(x"6d", x"11", x"db", x"ca"),
-			(x"88", x"0b", x"f9", x"00"),
-			(x"a3", x"3e", x"86", x"93"),
-			(x"7a", x"fd", x"41", x"fd") 
-		),
-		(
-			(x"4e", x"5f", x"84", x"4e"),
-			(x"54", x"5f", x"a6", x"a6"),
-			(x"f7", x"c9", x"4f", x"dc"),
-			(x"0e", x"f3", x"b2", x"4f") 
-		),
-		(
-			(x"ea", x"b5", x"31", x"7f"),
-			(x"d2", x"8d", x"2b", x"8d"),
-			(x"73", x"ba", x"f5", x"29"),
-			(x"21", x"d2", x"60", x"2f") 
-		),
-		(
-			(x"ac", x"19", x"28", x"57"),
-			(x"77", x"fa", x"d1", x"5c"),
-			(x"66", x"dc", x"29", x"00"),
-			(x"f3", x"21", x"41", x"6e") 
-		),
-		(
-			(x"d0", x"c9", x"e1", x"b6"),
-			(x"14", x"ee", x"3f", x"63"),
-			(x"f9", x"25", x"0c", x"0c"),
-			(x"a8", x"89", x"c8", x"a6") 
-		)
-	);
+	
 end package ;

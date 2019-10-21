@@ -50,14 +50,14 @@ begin
         
     PUT : process
     begin
-        sel_data_s <= x"0";
         start_s <= '0';
         wait for 200 ns;
         start_s <= '1';
         wait for 200 ns;
         start_s <= '0';
+        page_data_es <= x"00";
 
-        wait for 1300 ns;
+        wait for 1400 ns;
 
         page_expect : for k in 0 to 15 loop
             sel_data_s <= std_logic_vector(to_unsigned(k, 4));

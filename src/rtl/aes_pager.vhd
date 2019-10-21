@@ -42,7 +42,7 @@ begin
         clock_i => clock_s,
         start_i => start_i,
         inv_i => inv_i,
-        data_i => std_input_c,
+        data_i => data_s,
         key_i => std_input_key_c,
         data_o => next_data_s
     );

@@ -12,7 +12,7 @@ port (
 	start_i : in  std_logic;
 	count_i : in bit4;
 	end_keyexp_i : in std_logic;
-	inv_i : in std_logic;
+	invb_i : in std_logic;
 	start_keyexp_o : out std_logic;
 	en_mixcolumns_o : out std_logic;
 	en_round_o : out std_logic;
@@ -32,9 +32,7 @@ architecture aes_fsm_arch  of aes_fsm is
 	signal invb_s : std_logic;
 
 begin
-
-	invb_s <= not inv_i;
-
+	
 	state_register : process( clock_i, resetb_i )
 	begin
 		if resetb_i =	 '0' then

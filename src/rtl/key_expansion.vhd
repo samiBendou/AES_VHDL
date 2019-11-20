@@ -70,7 +70,8 @@ architecture key_expansion_arch of key_expansion is
 
 	signal en_mix_s : std_logic;
 	signal we_key_s : std_logic;
-	signal key_changed_s : std_logic;
+	signal key_changedb_s : std_logic;
+	signal end_s;
 
 	signal rcon_s : bit8;
 	signal key_s, round_key_s : bit128;
@@ -79,7 +80,8 @@ architecture key_expansion_arch of key_expansion is
 	signal we_reg_s : bit11;
 
 begin
-	key_changed_s <= '0' when key_i = reg_key_s(0) else '1';
+	end_s <= not inv_i;
+	key_changedb_s <= '1' when key_i = reg_key_s(0) else '0';
 	en_mix_s <= '0' when count_i = x"a" or count_i = x"0" else inv_i;
 
 	rcon_s <= rcon_c(to_integer(unsigned(count_i)));
@@ -90,8 +92,8 @@ begin
 		clock_i => clock_i,
 		resetb_i => resetb_i,
 		start_i => start_i,
-		inv_i => inv_i,
-		key_changed_i => key_changed_s,
+		end_i => end_s,
+		key_changedb_i => key_changedb_s,
 		count_i => count_i,
 		end_o => end_o,
 		we_key_o => we_key_s

@@ -81,8 +81,7 @@ begin
 		wait for 100 ns;
 		data_es <= (others => '0');
 		wait for 100 ns;
-		start_s <= '0';
-
+		
 		if count_test_s rem 4 = 1 then
 			wait for 1300 ns;
 		elsif count_test_s rem 4 = 2 then
@@ -96,7 +95,8 @@ begin
 		else
 			data_es <= std_input_c;
 		end if;
-
+		
+		start_s <= '0';
 		inv_s <= not inv_s;
 
 		wait for 200 ns;

@@ -83,7 +83,11 @@ begin
 			when lastround =>
 				next_state <= done;
 			when done =>
-				next_state <= hold;
+				if start_i = '1' then
+					next_state <= init;
+				else
+					next_state <= done;
+				end if;
 		end case;
 	end process state_comb;
 

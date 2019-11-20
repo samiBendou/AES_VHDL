@@ -79,3 +79,11 @@ begin
     cond_s <= data_es = data_os;
 
 end aes_round_tb_arch ; -- aes_round_tb_arch
+
+configuration aes_round_tb_conf of aes_round_tb is
+    for aes_round_tb_arch
+        for DUT : aes_round
+            use configuration lib_rtl.aes_round_conf;
+        end for;
+    end for;
+end configuration aes_round_tb_conf;

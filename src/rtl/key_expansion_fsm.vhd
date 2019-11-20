@@ -16,7 +16,7 @@ port (
 	clock_i : in std_logic;
 	resetb_i : in std_logic;
 	start_i : in std_logic;
-	end_i : in std_logic;
+	invb_i : in std_logic;
 	key_changedb_i : in std_logic;
 	count_i : in bit4;
 	end_o : out std_logic;
@@ -76,7 +76,7 @@ begin
 				end_o <= key_changedb_i;
 				we_key_o <= '0';
 			when start =>
-				end_o <= end_i;
+				end_o <= invb_i;
 				we_key_o <= '1';
 			when compute =>
 				end_o <= '0';

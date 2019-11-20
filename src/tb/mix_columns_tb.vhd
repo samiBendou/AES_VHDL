@@ -73,9 +73,9 @@ begin
 end architecture;
 
 configuration mix_columns_tb_conf of mix_columns_tb is
-for mix_columns_tb_arch
-    for DUT : mix_columns
-        use entity lib_round.mix_columns(mix_columns_arch);
+    for mix_columns_tb_arch
+        for DUT : mix_columns
+            use entity lib_round.mix_columns(mix_columns_arch);
+        end for;
     end for;
-end for;
 end configuration;

@@ -111,19 +111,9 @@ begin
 end architecture aes_tb_arch;
 
 configuration aes_tb_conf of aes_tb is
-for aes_tb_arch
-	for DUT : aes
-		for aes_arch
-			for all : key_expansion
-				use entity lib_rtl.key_expansion(key_expansion_arch);
-			end for;
-			for all : aes_fsm
-				use entity lib_rtl.aes_fsm(aes_fsm_arch);
-			end for;
-			for all : aes_round
-				use entity lib_rtl.aes_round(aes_round_arch);
-			end for;
+	for aes_tb_arch
+		for DUT : aes
+			use configuration lib_rtl.aes_conf;
 		end for;
 	end for;
-end for;
 end configuration aes_tb_conf;

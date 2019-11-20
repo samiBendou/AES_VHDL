@@ -54,9 +54,9 @@ begin
 end architecture shift_rows_tb_arch;
 
 configuration shift_rows_tb_conf of shift_rows_tb is
-for shift_rows_tb_arch
-    for DUT : shift_rows
-        use entity lib_round.shift_rows(shift_rows_arch);
+    for shift_rows_tb_arch
+        for DUT : shift_rows
+            use entity lib_round.shift_rows(shift_rows_arch);
+        end for;
     end for;
-end for;
 end configuration;

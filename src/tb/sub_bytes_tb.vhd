@@ -58,9 +58,9 @@ begin
 end architecture sub_bytes_tb_arch;
 
 configuration sub_bytes_tb_conf of sub_bytes_tb is
-for sub_bytes_tb_arch
-    for DUT : sub_bytes
-        use entity lib_round.sub_bytes(sub_bytes_arch);
-    end for;
-end for;
+	for sub_bytes_tb_arch
+		for DUT : sub_bytes
+			use entity lib_round.sub_bytes(sub_bytes_arch);
+		end for;
+	end for;
 end configuration;

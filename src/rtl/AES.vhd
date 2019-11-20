@@ -5,6 +5,9 @@ use ieee.numeric_std.all;
 library lib_thirdparty;
 use lib_thirdparty.crypt_pack.all;
 
+library lib_rtl;
+use lib_rtl.all;
+
 entity aes is
 port(	
     data_i : in bit128;
@@ -167,3 +170,23 @@ begin
 		);
 
 end architecture aes_arch;
+
+configuration aes_conf of aes is
+	for aes_arch
+		for reg : state_reg
+			use entity lib_thirdparty.state_reg(state_reg_arch);
+		end for;
+		for keyexp : key_expansion
+			use configuration lib_rtl.key_expansion_conf;
+		end for;
+		for fsm : aes_fsm
+			use entity lib_rtl.aes_fsm(aes_fsm_arch);
+		end for;
+		for round : aes_round
+			use configuration lib_rtl.aes_round_conf;
+		end for;
+		for count : round_counter
+			use entity lib_thirdparty.round_counter(round_counter_arch);
+		end for;
+	end for;
+end configuration;

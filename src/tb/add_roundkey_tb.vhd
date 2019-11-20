@@ -54,9 +54,9 @@ end architecture add_roundkey_tb_arch;
 
 
 configuration add_roundkey_tb_conf of add_roundkey_tb is
-for add_roundkey_tb_arch
-    for DUT : add_roundkey
-        use entity lib_round.add_roundkey(add_roundkey_arch);
+    for add_roundkey_tb_arch
+        for DUT : add_roundkey
+            use entity lib_round.add_roundkey(add_roundkey_arch);
+        end for;
     end for;
-end for;
 end configuration;

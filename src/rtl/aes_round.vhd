@@ -94,3 +94,20 @@ begin
 		);
 
 end architecture aes_round_arch;
+
+configuration aes_round_conf of aes_round is
+	for aes_round_arch
+		for subbytes : sub_bytes
+			use entity lib_round.sub_bytes(sub_bytes_arch);
+		end for;
+		for shiftrows : shift_rows
+			use entity lib_round.shift_rows(shift_rows_arch);
+		end for;
+		for mixcolumns : mix_columns
+			use entity lib_round.mix_columns(mix_columns_arch);
+		end for;
+		for addroundkey : add_roundkey
+			use entity lib_round.add_roundkey(add_roundkey_arch);
+		end for;
+	end for;
+end configuration;

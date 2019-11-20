@@ -35,8 +35,8 @@ architecture key_expansion_arch of key_expansion is
 		clock_i : in std_logic;
 		resetb_i : in std_logic;
 		start_i : in std_logic;
-		inv_i : in std_logic;
-		key_changed_i : std_logic;
+		end_i : in std_logic;
+		key_changedb_i : std_logic;
 		count_i : in bit4;
 		end_o : out std_logic;
 		we_key_o : out std_logic
@@ -71,7 +71,7 @@ architecture key_expansion_arch of key_expansion is
 	signal en_mix_s : std_logic;
 	signal we_key_s : std_logic;
 	signal key_changedb_s : std_logic;
-	signal end_s;
+	signal end_s : std_logic;
 
 	signal rcon_s : bit8;
 	signal key_s, round_key_s : bit128;

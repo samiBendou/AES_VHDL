@@ -25,12 +25,8 @@ port (
 end entity key_expansion_fsm;
 
 architecture key_expansion_fsm_arch of key_expansion_fsm is
-
 	type keyexp_state_t is (reset, hold, start, compute, done);
-
 	signal current_state, next_state : keyexp_state_t;
-	signal end_s : std_logic;
-	signal key_changedb_s : std_logic;
 begin
 	state_register : process ( clock_i, resetb_i ) is
 	begin
@@ -48,7 +44,7 @@ begin
 				next_state <= hold;
 			when hold => 
 				if start_i = '1' then
-					if key_changed_i = '0' then
+					if key_changedb_i = '1' then
 						next_state <= done;
 					else
 						next_state <= start;
@@ -57,7 +53,7 @@ begin
 					next_state <= hold;
 				end if;
 			when start =>
-					if key_changed_i = '1' then
+					if key_changedb_i = '0' then
 						next_state <= compute;
 					else
 						next_state <= done;
@@ -77,10 +73,10 @@ begin
 	begin
 		case current_state is
 			when reset | hold =>
-				end_o <= key_changedb_s;
+				end_o <= key_changedb_i;
 				we_key_o <= '0';
 			when start =>
-				end_o <= end_s;
+				end_o <= end_i;
 				we_key_o <= '1';
 			when compute =>
 				end_o <= '0';

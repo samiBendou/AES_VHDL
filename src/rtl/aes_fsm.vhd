@@ -26,11 +26,8 @@ port (
 end aes_fsm;
 
 architecture aes_fsm_arch  of aes_fsm is
-
 	type aes_state_t is (reset, hold, init, start_keyexp, load_keyexp, wait_keyexp, ready_keyexp, round0, roundn, lastround, done);
 	signal current_state, next_state : aes_state_t;
-	signal invb_s : std_logic;
-
 begin
 	
 	state_register : process( clock_i, resetb_i )
@@ -42,7 +39,7 @@ begin
 		end if;
 	end process state_register;
 
-	state_comb : process( current_state, count_i, start_i, end_keyexp_i, inv_i )
+	state_comb : process( current_state, count_i, start_i, end_keyexp_i, invb_i )
 	begin
 		case current_state is
 			when reset =>
@@ -62,7 +59,7 @@ begin
 			when start_keyexp =>
 				next_state <= load_keyexp;
 			when load_keyexp =>
-				if inv_i = '0' then
+				if invb_i = '1' then
 					next_state <= round0;
 				else
 					next_state <= wait_keyexp;
@@ -78,7 +75,7 @@ begin
 			when round0 =>
 				next_state <= roundn;
 			when roundn =>
-				if (count_i = x"9" and inv_i = '0') or (count_i = x"1" and inv_i = '1') then
+				if (count_i = x"9" and invb_i = '1') or (count_i = x"1" and invb_i = '0') then
 					next_state <= lastround;
 				else
 					next_state <= roundn;
@@ -119,7 +116,7 @@ begin
 				en_round_o <= '0';
 				en_out_o <= '0';
 				en_count_o <= '0';
-				up_count_o <= invb_s;
+				up_count_o <= invb_i;
 				we_data_o <= '1';
 				data_src_o <= '1';
 				done_o <= '0';
@@ -156,7 +153,7 @@ begin
 				en_round_o <= '0';
 				en_out_o <= '0';
 				en_count_o <= '1';
-				up_count_o <= invb_s;
+				up_count_o <= invb_i;
 				we_data_o <= '1';
 				data_src_o <= '0';
 				done_o <= '0';
@@ -166,7 +163,7 @@ begin
 				en_round_o <= '0';
 				en_out_o <= '0';
 				en_count_o <= '1';
-				up_count_o <= invb_s;
+				up_count_o <= invb_i;
 				we_data_o <= '0';
 				data_src_o <= '0';
 				done_o <= '0';
@@ -176,7 +173,7 @@ begin
 				en_round_o <= '1';
 				en_out_o <= '0';
 				en_count_o <= '1';
-				up_count_o <= invb_s;
+				up_count_o <= invb_i;
 				we_data_o <= '1';
 				data_src_o <= '0';
 				done_o <= '0';
@@ -186,7 +183,7 @@ begin
 				en_round_o <= '1';
 				en_out_o <= '0';
 				en_count_o <= '1';
-				up_count_o <= invb_s;
+				up_count_o <= invb_i;
 				we_data_o <= '1';
 				data_src_o <= '0';
 				done_o <= '0';

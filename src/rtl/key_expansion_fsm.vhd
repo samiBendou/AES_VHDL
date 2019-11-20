@@ -16,8 +16,8 @@ port (
 	clock_i : in std_logic;
 	resetb_i : in std_logic;
 	start_i : in std_logic;
-	inv_i : in std_logic;
-	key_changed_i : in std_logic;
+	end_i : in std_logic;
+	key_changedb_i : in std_logic;
 	count_i : in bit4;
 	end_o : out std_logic;
 	we_key_o : out std_logic
@@ -32,9 +32,6 @@ architecture key_expansion_fsm_arch of key_expansion_fsm is
 	signal end_s : std_logic;
 	signal key_changedb_s : std_logic;
 begin
-	end_s <= not inv_i;
-	key_changedb_s <= not key_changed_i;
-
 	state_register : process ( clock_i, resetb_i ) is
 	begin
 		if resetb_i = '0' then

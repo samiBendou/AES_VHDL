@@ -39,7 +39,7 @@ architecture aes_arch of aes is
 		start_i : in  std_logic;
 		count_i : in bit4;
 		end_keyexp_i : in std_logic;
-		inv_i : in std_logic;
+		invb_i : in std_logic;
 		start_keyexp_o : out std_logic;
 		en_mixcolumns_o : out std_logic;
 		en_round_o : out std_logic;
@@ -82,6 +82,7 @@ architecture aes_arch of aes is
 	end component;
 
 	signal resetb_s : std_logic;
+	signal invb_s : std_logic;
 
 	signal en_mixcolumns_s : std_logic;
 	signal en_round_s : std_logic;
@@ -103,6 +104,7 @@ begin
 	init_count_s <= x"0" when up_count_s = '1' else x"a";
 	data_o <= reg_data_s when en_out_s = '1' else (others => '0');
 	data_s <= data_i when data_src_s = '1' else round_data_s;
+	invb_s <= not inv_i;
 
 	reg : state_reg
 	port map(
@@ -132,7 +134,7 @@ begin
 		start_i => start_i,
 		count_i => count_s,
 		end_keyexp_i => end_keyexp_s,
-		inv_i => inv_i,
+		invb_i => invb_s,
 		start_keyexp_o => start_keyexp_s,
 		en_mixcolumns_o => en_mixcolumns_s,
 		en_round_o => en_round_s,
